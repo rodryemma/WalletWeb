@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infra.DataAccess.Interface
+namespace Domain.Model.Interfaces
 {
     public interface IContabilidadRepository
     {

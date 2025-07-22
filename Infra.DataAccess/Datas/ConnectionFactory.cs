@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
-using Infra.DataAccess.Interface;
+using Domain.Model;
+using Domain.Model.Interfaces;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -9,32 +10,28 @@ using System.Runtime.Intrinsics.X86;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Infra.DataAccess.Data
 {
     public class ConnectionFactory : IConnectionFactory
     {
-        static readonly string _DBMySql = "DataBase_MySqlRasp";
-        static readonly string _DBSqlServer = "DataBase_MySqlRasp";
+        //static readonly string _DBMySql = "DataBase_MySqlRasp";
+        //static readonly string _DBSqlServer = "DataBase_MySqlRasp";
 
-        private readonly string _connectionString;
 
-        public ConnectionFactory(IConfiguration configuration)
-        {
-           _connectionString = configuration.GetConnectionString("DataBase_MySqlRasp");
-        }
 
         #region Mysql
-        public MySqlConnection ObtenerConexionMySql()
+        public MySqlConnection ObtenerConexionMySql(string xCadena)
         {
             try
             {
-                MySqlConnection conexion = new MySqlConnection(ObtenerCadena(_DBMySql));
+                MySqlConnection conexion = new MySqlConnection(ObtenerCadena(xCadena));
                 conexion.Open();
                 return conexion;
             }
             catch (Exception ex)
             {
-                var sDataError = ObtenerCadena(_DBMySql).Split(';');
+                var sDataError = ObtenerCadena(xCadena).Split(';');
                 //TODO
                 //MessageBox.Show("No se conecto con la base de datos: " + sDataError[0]);
                 //MessageBox.Show("Error: " + ex.Message);
@@ -43,11 +40,11 @@ namespace Infra.DataAccess.Data
 
         }
 
-        public async Task<MySqlConnection> ObtenerConexionMySqlAsync()
+        public async Task<MySqlConnection> ObtenerConexionMySqlAsync(string xCadena)
         {
             try
             {
-                MySqlConnection conexion = new MySqlConnection(ObtenerCadena(_DBMySql));
+                MySqlConnection conexion = new MySqlConnection(ObtenerCadena(xCadena));
                 await conexion.OpenAsync();
                 return conexion;
             }
@@ -103,10 +100,8 @@ namespace Infra.DataAccess.Data
 
         public static string ObtenerCadena(string xCadena)
         {
-            
-            var urlAppConf2 = _connectionString;
 
-            String urlconectionString = _connectionString;
+            String urlconectionString = xCadena;
 
             String server = "";
             String user = "";
@@ -143,3 +138,4 @@ namespace Infra.DataAccess.Data
             return connString;
         }
     }
+}

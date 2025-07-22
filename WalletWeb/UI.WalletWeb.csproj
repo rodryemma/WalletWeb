@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Application.Interfaces\Application.csproj" />
     <ProjectReference Include="..\Domain.Entity\Domain.Model.csproj" />
     <ProjectReference Include="..\Infra.DataAccess\Infra.DataAccess.csproj" />
   </ItemGroup>

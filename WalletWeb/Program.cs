@@ -1,5 +1,7 @@
+using Application.Services;
+using Application.Interfaces;
+using Domain.Model.Interfaces;
 using Infra.DataAccess.Data;
-using Infra.DataAccess.Interface;
 using Infra.DataAccess.Repository;
 using Microsoft.AspNetCore.Connections;
 
@@ -8,8 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 //builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
-builder.Services.AddTransient<Infra.DataAccess.Interface.IConnectionFactory, ConnectionFactory>();
+builder.Services.AddTransient<Domain.Model.Interfaces.IConnectionFactory, ConnectionFactory>();
 builder.Services.AddScoped<IContabilidadRepository, ContabilidadRepository>();
+builder.Services.AddScoped<IContabilidadService, ContabilidadService>();
 
 
 var app = builder.Build();

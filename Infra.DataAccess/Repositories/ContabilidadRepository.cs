@@ -1,5 +1,6 @@
 ﻿using Domain.Model.Entity;
-using Infra.DataAccess.Interface;
+using Domain.Model.Interfaces;
+using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using System;
 using System.Collections.Generic;
@@ -13,15 +14,17 @@ namespace Infra.DataAccess.Repository
     public class ContabilidadRepository : IContabilidadRepository
     {
         private readonly IConnectionFactory _IConnectionFactory;
+        private readonly string _connectionString;
 
-        public ContabilidadRepository(IConnectionFactory xIConnectionFactory)
+        public ContabilidadRepository(IConfiguration configuration, IConnectionFactory xIConnectionFactory)
         {
+            _connectionString = configuration.GetConnectionString("DataBase_MySqlRasp");
             _IConnectionFactory = xIConnectionFactory;
         }
 
         public List<Contabilidad> ObtenerContabilidadDBFull(string xTipo)
         {
-            using (MySqlConnection c = _IConnectionFactory.ObtenerConexionMySql())
+            using (MySqlConnection c = _IConnectionFactory.ObtenerConexionMySql(_connectionString))
             {
                 try
                 {
@@ -70,7 +73,7 @@ namespace Infra.DataAccess.Repository
 
         public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsync(string xTipo)
         {
-            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync())
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
@@ -116,9 +119,10 @@ namespace Infra.DataAccess.Repository
             }
 
         }
+
         public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsync(string xTipo, DateTime xFechaDesde)
         {
-            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync())
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
@@ -170,7 +174,7 @@ namespace Infra.DataAccess.Repository
 
         public DataTable ObtenerContabilidadDBFull()
         {
-            using (MySqlConnection c = _IConnectionFactory.ObtenerConexionMySql())
+            using (MySqlConnection c = _IConnectionFactory.ObtenerConexionMySql(_connectionString))
             {
                 try
                 {
@@ -206,7 +210,7 @@ namespace Infra.DataAccess.Repository
         {
             int respt = 0;
 
-            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync())
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
