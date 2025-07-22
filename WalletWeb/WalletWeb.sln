@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36202.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UI.WalletWeb", "UI.WalletWeb.csproj", "{4F28031F-4D37-44DD-AF42-4512652305DE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UserInterface", "UserInterface", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Application", "Application", "{72E48071-4E93-4911-BD6E-8DFF4AF7A461}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Domain", "Domain", "{A6ECCD9B-0B3A-4179-9F32-54F58FA139D8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Infrastructure", "Infrastructure", "{AC42E549-0ED1-4A24-B1DE-2ADD4EB8A3BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain.Model", "..\Domain.Entity\Domain.Model.csproj", "{FDFEF783-4146-47CA-91B5-34C20EA42D89}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infra.DataAccess", "..\Infra.DataAccess\Infra.DataAccess.csproj", "{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F28031F-4D37-44DD-AF42-4512652305DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F28031F-4D37-44DD-AF42-4512652305DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F28031F-4D37-44DD-AF42-4512652305DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F28031F-4D37-44DD-AF42-4512652305DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FDFEF783-4146-47CA-91B5-34C20EA42D89}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FDFEF783-4146-47CA-91B5-34C20EA42D89}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FDFEF783-4146-47CA-91B5-34C20EA42D89}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FDFEF783-4146-47CA-91B5-34C20EA42D89}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4F28031F-4D37-44DD-AF42-4512652305DE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{FDFEF783-4146-47CA-91B5-34C20EA42D89} = {A6ECCD9B-0B3A-4179-9F32-54F58FA139D8}
+		{8BECBB51-DC00-49F7-9885-7DD4CF7DB3C3} = {AC42E549-0ED1-4A24-B1DE-2ADD4EB8A3BA}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D6ED35CD-34E2-4723-BCA7-1693FA695A77}
+	EndGlobalSection
+EndGlobal
