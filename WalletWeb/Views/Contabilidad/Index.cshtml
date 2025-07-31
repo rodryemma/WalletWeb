@@ -1,0 +1,126 @@
+﻿@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Transacciones</h2>
+
+<p>Total en USD: <span id="totalMonto">0.00</span></p>
+
+<div>
+    <label for="tipoMovimientoSelect" class="form-label me-2">Filtrar por movimiento:</label>
+    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
+        <option value="total">Total</option>
+        <option value="gastos">Gastos</option>
+        <option value="ingresos">Ingresos</option>
+    </select>
+</div>
+
+<div>
+    <label>Fecha desde:</label>
+    <input type="date" id="fechaDesde">
+    <label>Fecha hasta:</label>
+    <input type="date" id="fechaHasta">
+</div>
+
+
+<div>
+    <table id="tablaTransacciones" class="display">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Categoría</th>
+                <th>Cuenta</th>
+                <th>Monto Usd</th>
+                <th>Comentario</th>
+                <th>Tipo Movimiento</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+            let fechaDesde = $('#fechaDesde').val();
+            let fechaHasta = $('#fechaHasta').val();
+            let fechaColumna = data[0]; 
+
+            if (!fechaColumna) return false;
+
+            // Convertir a formato compatible (si es necesario)
+            let fecha = new Date(fechaColumna.split('/').reverse().join('-'));
+            let desde = fechaDesde ? new Date(fechaDesde) : null;
+            let hasta = fechaHasta ? new Date(fechaHasta) : null;
+
+            return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
+            });
+
+            $('#fechaDesde, #fechaHasta').on('change', function () {
+                $('#tablaTransacciones').DataTable().draw();
+            });
+
+            var tabla = $('#tablaTransacciones').DataTable({
+                responsive: true,
+                paging: true,
+                destroy: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                ajax: {
+                    url: '/transacciones/json',
+                    data: function (d) {
+                         d.tipoMovimiento = $('#tipoMovimientoSelect').val();
+                    }
+                },
+                order: [[0, 'desc']],//Fecha de forma descendente
+                columns: [
+                    {
+                        data: 'fecha',
+                        title: 'Fecha',
+                        render: function (data, type, row) {
+                            if (type === 'display' || type === 'filter') {
+                                const date = new Date(data);
+                                return date.toLocaleDateString();
+                            }
+                            return data;
+                        }
+                    },
+                    { data: 'categoria' },
+                    { data: 'cuenta' },
+                    { 
+                        data: 'montoUsd' ,
+                        render: $.fn.dataTable.render.number(',', '.', 2, '$')
+                    },
+                    { data: 'comentario' },
+                    { data: 'tipoMovimiento' }
+                    ],
+                    footerCallback: function (row, data, start, end, display) {
+                        var api = this.api();
+                        var total = api
+                            .column(3, { filter: 'applied' })//Hacemos que se aplique el filtro en la celda 3 montoUsd
+                            .data()
+                            .reduce(function (a, b) {
+                                var x = typeof a === 'string' ? parseFloat(a.replace(/[\$,]/g, '')) : a;
+                                var y = typeof b === 'string' ? parseFloat(b.replace(/[\$,]/g, '')) : b;
+                                return (x || 0) + (y || 0);
+                            }, 0);
+
+                     // Mostrar el total en el <span>
+                     $('#totalMonto').text(total.toFixed(2));
+                    }
+            });
+
+            $('#tipoMovimientoSelect').change(function () {
+            tabla.ajax.reload();
+            });
+        });
+    </script>
+}

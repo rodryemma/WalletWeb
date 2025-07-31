@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Common;
+using Application.DTOs;
+using Application.Interfaces;
 using Domain.Model.Entity;
 using Domain.Model.Interfaces;
 using System;
@@ -24,9 +26,19 @@ namespace Application.Services
             return _ContabilidadRepository.ObtenerContabilidadDBFull(xTipo);
         }
 
-        public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsyncService(string xTipo)
+        public async Task<List<ContabilidadDto>> ObtenerContabilidadDBFullAsyncService(string xTipo)
         {
-            return await _ContabilidadRepository.ObtenerContabilidadDBFullAsync(xTipo);
+            var contabilidadMovimientos = await _ContabilidadRepository.ObtenerContabilidadDBFullAsync(xTipo);
+            return contabilidadMovimientos.Select(m => new ContabilidadDto
+            {
+                Id = m.Id,
+                Fecha = m.Fecha,
+                Categoria = m.Categoria,
+                Cuenta = m.Cuenta,
+                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL),2),
+                Comentario = m.Comentario,
+                TipoMovimiento = m.TipoMovimiento
+            }).ToList();
         }
 
         public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde)

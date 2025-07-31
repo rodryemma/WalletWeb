@@ -77,28 +77,46 @@ namespace Infra.DataAccess.Repository
             {
                 try
                 {
-                    var sqlString = $"SELECT * FROM ContabilidadPersonal WHERE TipoMovimiento = '{xTipo.ToLower()}' ORDER BY Fecha DESC";
+                    
+                    var baseSql = "SELECT * FROM ContabilidadPersonal";
+                    var whereClause = "";
+                    var parametros = new List<MySqlParameter>();
 
-                    MySqlCommand Comando = new MySqlCommand(sqlString, c);
-                    MySqlDataReader reader = await Comando.ExecuteReaderAsync();
-                    List<Contabilidad> query = new List<Contabilidad>();
-                    while (await reader.ReadAsync())
+                    if (!string.Equals(xTipo, "total", StringComparison.OrdinalIgnoreCase))
                     {
-                        query.Add(new Contabilidad()
-                        {
-                            Id = int.Parse(reader["Id"].ToString()),
-                            Fecha = Convert.ToDateTime(reader["Fecha"].ToString()),
-                            Categoria = reader["Cateria"].ToString(),
-                            Cuenta = reader["Cuenta"].ToString(),
-                            CantidadDivisa = float.Parse(reader["CantidadDivisa"].ToString()),
-                            Divisa = reader["Divisa"].ToString(),
-                            Comentario = reader["Comentario"].ToString(),
-                            TipoMovimiento = reader["TipoMovimiento"].ToString(),
-                            ValorCCL = float.Parse(reader["ValorCCL"].ToString())
-                        });
-
+                        whereClause = " WHERE TipoMovimiento = @Tipo";
+                        parametros.Add(new MySqlParameter("@Tipo", xTipo.ToLower()));
                     }
-                    return query;
+
+                    var sqlString = $"{baseSql}{whereClause} ORDER BY Fecha DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        if (parametros.Any())
+                            Comando.Parameters.AddRange(parametros.ToArray());
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Contabilidad> query = new List<Contabilidad>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Contabilidad()
+                                {
+                                    Id = int.Parse(reader["Id"].ToString()),
+                                    Fecha = Convert.ToDateTime(reader["Fecha"].ToString()),
+                                    Categoria = reader["Cateria"].ToString(),
+                                    Cuenta = reader["Cuenta"].ToString(),
+                                    CantidadDivisa = float.Parse(reader["CantidadDivisa"].ToString()),
+                                    Divisa = reader["Divisa"].ToString(),
+                                    Comentario = reader["Comentario"].ToString(),
+                                    TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                    ValorCCL = float.Parse(reader["ValorCCL"].ToString())
+                                });
+
+                            }
+                            return query;
+                        }
+                    }
                 }
                 catch (MySqlException ex)
                 {
