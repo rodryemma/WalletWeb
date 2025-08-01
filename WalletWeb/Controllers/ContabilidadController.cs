@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.CodeDom;
@@ -40,5 +41,36 @@ namespace UI.WalletWeb.Controllers
             });
 
         }
+
+        [HttpPost("transacciones/editar")]
+        public IActionResult Editar([FromBody] ContabilidadDto transaccion)
+        {
+            // Validaciones y lógica
+            //var entidad = db.Transacciones.FirstOrDefault(x => x.Id == transaccion.Id);
+            //if (entidad == null) return NotFound();
+
+            //entidad.Fecha = transaccion.Fecha;
+            //entidad.Categoria = transaccion.Categoria;
+            //entidad.Cuenta = transaccion.Cuenta;
+            //entidad.MontoUsd = transaccion.MontoUsd;
+            //entidad.Comentario = transaccion.Comentario;
+            //entidad.TipoMovimiento = transaccion.TipoMovimiento;
+
+            //db.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost("transacciones/eliminar")]
+        public IActionResult Eliminar([FromBody] EliminarDto eliminar)
+        {
+            var transaccion = ""; //Llamar repository para eliminar 
+            if (transaccion != null)
+            {
+                return Json(new { success = true });
+            }
+            return Json(new { success = false });
+        }
+
+
     }
 }
