@@ -260,5 +260,56 @@ namespace Infra.DataAccess.Repository
             }
             return respt;
         }
+
+        public async Task<int> EditarContabilidadPersonalAsync(Contabilidad xContabilidad)
+        {
+            int respt = 0;
+
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+                    string sqlString = @"UPDATE ContabilidadPersonal 
+                                 SET 
+                                     Fecha = @Fecha,
+                                     Cateria = @Categoria,
+                                     Cuenta = @Cuenta,
+                                     CantidadDivisa = @CantidadDivisa,
+                                     Divisa = @Divisa,
+                                     Comentario = @Comentario,
+                                     TipoMovimiento = @TipoMovimiento,
+                                     ValorCCL = @ValorCCL
+                                 WHERE Id = @Id";
+
+                    using (MySqlCommand comando = new MySqlCommand(sqlString, c))
+                    {
+                        comando.Parameters.AddWithValue("@Fecha", xContabilidad.Fecha.ToString("yyyy-MM-dd HH:mm:ss"));
+                        comando.Parameters.AddWithValue("@Categoria", xContabilidad.Categoria);
+                        comando.Parameters.AddWithValue("@Cuenta", xContabilidad.Cuenta);
+                        comando.Parameters.AddWithValue("@CantidadDivisa", xContabilidad.CantidadDivisa);
+                        comando.Parameters.AddWithValue("@Divisa", xContabilidad.Divisa);
+                        comando.Parameters.AddWithValue("@Comentario", xContabilidad.Comentario);
+                        comando.Parameters.AddWithValue("@TipoMovimiento", xContabilidad.TipoMovimiento);
+                        comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
+                        comando.Parameters.AddWithValue("@Id", xContabilidad.Id);
+
+                        await comando.ExecuteNonQueryAsync();
+                        respt = 1;
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    // log o manejo del error
+                    respt = 0;
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+
+            return respt;
+        }
+
     }
 }

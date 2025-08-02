@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Domain.Model.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.CodeDom;
@@ -31,9 +32,12 @@ namespace UI.WalletWeb.Controllers
                 Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
                 x.Categoria,
                 x.Cuenta,
-                x.MontoUsd,
+                x.CantidadDivisa,
+                x.Divisa,
                 x.Comentario,
-                x.TipoMovimiento                
+                x.TipoMovimiento,
+                x.ValorCCL,
+                x.MontoUsd
             }).ToList();
             return Json(new
             {
@@ -43,21 +47,41 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpPost("transacciones/editar")]
-        public IActionResult Editar([FromBody] ContabilidadDto transaccion)
+        public async Task<IActionResult> Editar([FromBody] ContabilidadDto transaccion)
         {
+            if (transaccion == null)
+            {
+                return BadRequest("La transacción enviada es nula.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(new { errors });
+            }
+
             // Validaciones y lógica
-            //var entidad = db.Transacciones.FirstOrDefault(x => x.Id == transaccion.Id);
-            //if (entidad == null) return NotFound();
+            var editContabilidad = new Contabilidad()
+            {
+                Id = transaccion.Id,
+                Fecha = transaccion.Fecha,
+                CantidadDivisa = transaccion.CantidadDivisa,
+                Categoria = transaccion.Categoria,
+                Comentario = transaccion.Comentario,
+                Cuenta = transaccion.Cuenta,
+                Divisa = transaccion.Divisa,
+                TipoMovimiento = transaccion.TipoMovimiento,
+                ValorCCL = transaccion.ValorCCL
+            };
 
-            //entidad.Fecha = transaccion.Fecha;
-            //entidad.Categoria = transaccion.Categoria;
-            //entidad.Cuenta = transaccion.Cuenta;
-            //entidad.MontoUsd = transaccion.MontoUsd;
-            //entidad.Comentario = transaccion.Comentario;
-            //entidad.TipoMovimiento = transaccion.TipoMovimiento;
-
-            //db.SaveChanges();
-            return Ok();
+            var transacciones = await _contabilidaService.EditarContabilidadPersonalAsyncService(editContabilidad);            
+            return transacciones == 1 ? 
+                Ok() :
+                BadRequest(); 
         }
 
         [HttpPost("transacciones/eliminar")]

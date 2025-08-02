@@ -41,7 +41,7 @@
 </div>
 
 
-<!-- Modal de confirmación -->
+<!-- Modal de Eliminación -->
 <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -68,48 +68,65 @@
                 <h5 class="modal-title" id="tituloEditar">Editar transacción</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-3">              
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
 
-                    <div class="mb-2">
-                        <label for="editarFecha" class="form-label">Fecha</label>
-                        <input type="date" class="form-control" id="editarFecha" required />
-                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="editarFecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="editarFecha" required />
+                        </div>
 
-                    <div class="mb-2">
-                        <label for="editarCategoria" class="form-label">Categoría</label>
-                        <input type="text" class="form-control" id="editarCategoria" required />
-                    </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="editarCategoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="editarCategoria" required />
+                        </div>
 
-                    <div class="mb-2">
-                        <label for="editarCuenta" class="form-label">Cuenta</label>
-                        <input type="text" class="form-control" id="editarCuenta" required />
-                    </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="editarCuenta" class="form-label">Cuenta</label>
+                            <input type="text" class="form-control" id="editarCuenta" required />
+                        </div>
 
-                    <div class="mb-2">
-                        <label for="editarMontoUsd" class="form-label">Monto USD</label>
-                        <input type="number" class="form-control" id="editarMontoUsd" required />
-                    </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="editarCantidadDivisa" class="form-label">Cantidad Divisa</label>
+                            <input type="number" step="any" class="form-control" id="editarCantidadDivisa" required />
+                        </div>
 
-                    <div class="mb-2">
-                        <label for="editarComentario" class="form-label">Comentario</label>
-                        <input type="text" class="form-control" id="editarComentario" />
-                    </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="editarDivisa" class="form-label">Divisa</label>
+                            <input type="text" class="form-control" id="editarDivisa" required />
+                        </div>
 
-                    <div class="mb-2">
-                        <label for="editarTipoMovimiento" class="form-label">Tipo Movimiento</label>
-                        <select class="form-control" id="editarTipoMovimiento">
-                            <option value="ingresos">Ingresos</option>
-                            <option value="gastos">Gastos</option>
-                        </select>
-                    </div>
+                        <div class="col-md-6 mb-2">
+                            <label for="editarComentario" class="form-label">Comentario</label>
+                            <input type="text" class="form-control" id="editarComentario" required />
+                        </div>
 
+                        <div class="col-md-6 mb-2">
+                            <label for="editarValorCCL" class="form-label">Valor CCL</label>
+                            <input type="number" step="any" class="form-control" id="editarValorCCL" required />
+                        </div>
+
+                        @* <div class="col-md-6 mb-2">
+                            <label for="editarMontoUsd" class="form-label">Monto USD</label>
+                            <input type="number" step="any" class="form-control" id="editarMontoUsd" required />
+                        </div> *@
+
+                        <div class="col-md-6 mb-2">
+                            <label for="editarTipoMovimiento" class="form-label">Tipo Movimiento</label>
+                            <select class="form-control" id="editarTipoMovimiento">
+                                <option value="ingresos">Ingresos</option>
+                                <option value="gastos">Gastos</option>
+                            </select>
+                        </div>
+                    </div>
                 </form>
+
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button class="btn btn-primary" id="btnGuardarCambios">Guardar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardarCambios">Guardar</button>
             </div>
         </div>
     </div>
@@ -129,7 +146,7 @@
             $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             let fechaDesde = $('#fechaDesde').val();
             let fechaHasta = $('#fechaHasta').val();
-            let fechaColumna = data[0]; 
+            let fechaColumna = data[0];
 
             if (!fechaColumna) return false;
 
@@ -173,7 +190,7 @@
                     },
                     { data: 'categoria' },
                     { data: 'cuenta' },
-                    { 
+                    {
                         data: 'montoUsd' ,
                         render: $.fn.dataTable.render.number(',', '.', 2, '$')
                     },
@@ -187,7 +204,7 @@
                           return `
                               <button class="btn-editar btn btn-sm btn-primary" data-id="${row.id}">Editar</button>
                               <button class="btn-eliminar btn btn-sm btn-danger" data-id="${row.id}">
-                                      Eliminar 
+                                      Eliminar
                                       <i class="bi bi-trash-fill"></i>
                               </button>
                           `;
@@ -215,88 +232,281 @@
             });
         });
 
-        
+
         let idAEliminar = null;
 
-        $('#tablaTransacciones').on('click', '.btn-eliminar', function () {
-            // var id = $(this).data('id');
-            idAEliminar = $(this).data('id');
-            const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
-            modal.show();
-        });
-          
+        // $('#tablaTransacciones').on('click', '.btn-eliminar', function () {
+        //     // var id = $(this).data('id');
+        //     idAEliminar = $(this).data('id');
+        //     const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+        //     modal.show();
+        // });
 
-        $('#btnConfirmarEliminar').on('click', function () {
-            // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
-            if (idAEliminar !== null) {
-                //console.log('Eliminar ID:', idAEliminar);
-                const data = { id : idAEliminar };
-                $.ajax({
-                    url: `/transacciones/eliminar`,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(data),
-                    success: function () {
-                        $('#tablaTransacciones').DataTable().ajax.reload();
-                        idAEliminar = null;
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
-                        modal.hide();
-                        // TODO Opcional: mostrar un toast o mensaje de éxito
-                    },
-                    error: function () {
-                        alert("Error al eliminar el registro.");
-                    }
-                });
+        document.querySelector('#tablaTransacciones').addEventListener('click', function (e) {
+            if (e.target.classList.contains('btn-eliminar')) {
+                idAEliminar = e.target.dataset.id;
+                document.getElementById('modalConfirmarEliminar').dataset.id = idAEliminar;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+                modal.show();
             }
         });
 
-        $('#tablaTransacciones').on('click', '.btn-editar', function () {
-            const id = $(this).data('id');
-            
-            const row = $('#tablaTransacciones').DataTable().row($(this).parents('tr')).data();
-                          
-            const fechaFormateada = row.fecha.toString().split('T')[0];
-            console.log("Valor crudo de Fecha:", row.id);
-            // Llenamos los campos del modal con los datos
-            $('#editarId').val(row.id);
-            $('#editarFecha').val(fechaFormateada);
-            $('#editarCategoria').val(row.categoria);
-            $('#editarCuenta').val(row.cuenta);
-            $('#editarMontoUsd').val(row.montoUsd);
-            $('#editarComentario').val(row.comentario);
-            $('#editarTipoMovimiento').val(row.tipoMovimiento);
 
-            const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
-            modal.show();
-        });
+        // $('#btnConfirmarEliminar').on('click', function () {
+        //     // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
+        //     if (idAEliminar !== null) {
+        //         //console.log('Eliminar ID:', idAEliminar);
+        //         const data = { id : idAEliminar };
+        //         $.ajax({
+        //             url: `/transacciones/eliminar`,
+        //             method: 'POST',
+        //             contentType: 'application/json',
+        //             data: JSON.stringify(data),
+        //             success: function () {
+        //                 $('#tablaTransacciones').DataTable().ajax.reload();
+        //                 idAEliminar = null;
+        //                 const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
+        //                 modal.hide();
+        //                 // TODO Opcional: mostrar un toast o mensaje de éxito
+        //             },
+        //             error: function () {
+        //                 alert("Error al eliminar el registro.");
+        //             }
+        //         });
+        //     }
+        // });
 
-        $('#btnGuardarCambios').on('click', function () {
-            // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
-            const data = {
-                Id: $('#editarId').val(),
-                Fecha: $('#editarFecha').val(),
-                Categoria: $('#editarCategoria').val(),
-                Cuenta: $('#editarCuenta').val(),
-                MontoUsd: parseFloat($('#editarMontoUsd').val()),
-                Comentario: $('#editarComentario').val(),
-                TipoMovimiento: $('#editarTipoMovimiento').val()
-            };
-            
-            $.ajax({
-                url: '/transacciones/editar',
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                success: function () {
-                    $('#tablaTransacciones').DataTable().ajax.reload();
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditar'));
-                    modal.hide();
-                },
-                error: function () {
-                    alert('Error al guardar los cambios.');
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnEliminar = document.getElementById('btnConfirmarEliminar');
+
+            btnEliminar.addEventListener('click', function () {
+                if (typeof idAEliminar !== 'undefined' && idAEliminar !== null) {
+                    btnEliminar.disabled = true;
+
+                    const data = { id: idAEliminar };
+
+                    fetch('/transacciones/eliminar', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        if (!response.ok) throw new Error('Error al eliminar');
+                        return response.text();
+                    })
+                    .then(() => {
+                        if (window.$ && $.fn.DataTable) {
+                            $('#tablaTransacciones').DataTable().ajax.reload();
+                        }
+
+                        idAEliminar = null;
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
+                        if (modal) modal.hide();
+                                                
+                        mostrarToast('Registro eliminado correctamente', 'success');
+                    })
+                    .catch(error => {
+                        console.error('Error al eliminar:', error);
+                        //mostrarToast('Error al eliminar el registro', 'danger');
+                        mostrarToast(error.message, 'danger');
+
+                    })
+                    .finally(() => {
+                        btnEliminar.disabled = false;
+                    });
                 }
             });
         });
+
+        // $('#tablaTransacciones').on('click', '.btn-editar', function () {
+        //     const id = $(this).data('id');
+
+        //     const row = $('#tablaTransacciones').DataTable().row($(this).parents('tr')).data();
+
+        //     const fechaFormateada = row.fecha.toString().split('T')[0];
+        //     // TODO console.log("Valor crudo de Fecha:", row.id);
+        //     // Llenamos los campos del modal con los datos
+        //     $('#editarId').val(row.id);
+        //     $('#editarFecha').val(fechaFormateada);
+        //     $('#editarCategoria').val(row.categoria);
+        //     $('#editarCuenta').val(row.cuenta);
+        //     $('#editarCantidadDivisa').val(row.cantidadDivisa);
+        //     $('#editarDivisa').val(row.divisa);
+        //     $('#editarComentario').val(row.comentario);
+        //     $('#editarTipoMovimiento').val(row.tipoMovimiento);
+        //     $('#editarValorCCL').val(row.valorCCL);
+        //     $('#editarMontoUsd').val(row.montoUsd);
+
+        //     const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
+        //     modal.show();
+        // });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabla = document.getElementById('tablaTransacciones');
+
+            tabla.addEventListener('click', function (event) {
+                const target = event.target;
+
+                if (target.classList.contains('btn-editar')) {
+                    const id = target.getAttribute('data-id');
+
+                    // Encontramos la fila asociada
+                    const tr = target.closest('tr');
+
+                    // Usamos DataTables para obtener la data
+                    const row = $('#tablaTransacciones').DataTable().row(tr).data();
+
+                    if (!row) {
+                        console.error('No se encontró la fila en DataTable');
+                        return;
+                    }
+
+                    const fechaFormateada = row.fecha?.toString().split('T')[0];
+
+                    // Llenar los campos del modal
+                    document.getElementById('editarId').value = row.id;
+                    document.getElementById('editarFecha').value = fechaFormateada;
+                    document.getElementById('editarCategoria').value = row.categoria;
+                    document.getElementById('editarCuenta').value = row.cuenta;
+                    document.getElementById('editarCantidadDivisa').value = row.cantidadDivisa;
+                    document.getElementById('editarDivisa').value = row.divisa;
+                    document.getElementById('editarComentario').value = row.comentario;
+                    document.getElementById('editarTipoMovimiento').value = row.tipoMovimiento;
+                    document.getElementById('editarValorCCL').value = row.valorCCL;
+                    //document.getElementById('editarMontoUsd').value = row.montoUsd;
+
+                    // Mostrar el modal
+                    const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+                    modalEditar.show();
+                }
+            });
+        });
+
+        // $('#btnGuardarCambios').on('click', function () {
+        //     // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
+        //     const data = {
+        //         Id: $('#editarId').val(),
+        //         Fecha: $('#editarFecha').val(),
+        //         Categoria: $('#editarCategoria').val(),
+        //         Cuenta: $('#editarCuenta').val(),
+        //         CantidadDivisa: $('#editarCantidadDivisa').val(),
+        //         Divisa: $('#editarDivisa').val(),
+        //         Comentario: $('#editarComentario').val(),
+        //         TipoMovimiento: $('#editarTipoMovimiento').val(),
+        //         ValorCCL: $('#editarValorCCL').val(),
+        //         MontoUsd: parseFloat($('#editarMontoUsd').val())
+        //     };
+
+        //     $.ajax({
+        //         url: '/transacciones/editar',
+        //         method: 'POST',
+        //         contentType: 'application/json',
+        //         data: JSON.stringify(data),
+        //         success: function () {
+        //             $('#tablaTransacciones').DataTable().ajax.reload();
+        //             const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditar'));
+        //             modal.hide();
+        //         },
+        //         error: function () {
+        //             alert('Error al guardar los cambios.');
+        //         }
+        //     });
+        // });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnGuardar = document.getElementById('btnGuardarCambios');
+            const form = document.getElementById("formEditar");
+
+            //Validar formulario "formEditar"
+            btnGuardar.addEventListener('click', function () {
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Desactivar el botón para evitar múltiples envíos
+                btnGuardar.disabled = true;
+
+                const data = {
+                    Id: document.getElementById('editarId').value,
+                    Fecha: document.getElementById('editarFecha').value,
+                    Categoria: document.getElementById('editarCategoria').value,
+                    Cuenta: document.getElementById('editarCuenta').value,
+                    CantidadDivisa: document.getElementById('editarCantidadDivisa').value,
+                    Divisa: document.getElementById('editarDivisa').value,
+                    Comentario: document.getElementById('editarComentario').value,
+                    TipoMovimiento: document.getElementById('editarTipoMovimiento').value,
+                    ValorCCL: document.getElementById('editarValorCCL').value,
+                    //MontoUsd: parseFloat(document.getElementById('editarMontoUsd').value)
+                };
+
+                fetch('/transacciones/editar', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(async response => {
+                    // if (!response.ok) throw new Error('Error en la respuesta');
+                    
+                    // const contentType = response.headers.get('content-type');
+                    // if (contentType && contentType.includes('application/json')) {
+                    //     return await response.json();
+                    // }
+                    // return null;
+                    
+                    const contentType = response.headers.get('content-type');
+                    const isJson = contentType && contentType.includes('application/json');
+                    
+                    if (!response.ok) {
+                        const errorData = isJson ? await response.json() : await response.text();
+                    
+                        let mensajeError = 'Error en la respuesta';
+                        if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
+                            mensajeError = errorData.errors.join('\n');
+                        } else if (typeof errorData === 'string') {
+                            mensajeError = errorData;
+                        }
+                    
+                        throw new Error(mensajeError);
+                    }
+                    
+                    return isJson ? await response.json() : null;
+                })               
+                .then(result => {
+                    // Recargar DataTable (si seguís usando jQuery solo para eso)
+                    if (window.$ && $.fn.DataTable) {
+                        $('#tablaTransacciones').DataTable().ajax.reload();
+                    }
+
+                    // Cerrar el modal de Bootstrap
+                    const modalElement = document.getElementById('modalEditar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    mostrarToast('Cambios guardados correctamente', 'success');
+                })
+                .catch(error => {
+                    console.error('Error al guardar:', error);
+                    // alert('Error al guardar los cambios.');
+                    //mostrarToast('Error al guardar', 'danger');
+                    mostrarToast(error.message, 'danger');
+
+                })
+                .finally(() => {
+                    btnGuardar.disabled = false;
+                });
+            });
+        });
+
+        
+
 
 
     </script>

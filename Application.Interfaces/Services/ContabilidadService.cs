@@ -35,9 +35,13 @@ namespace Application.Services
                 Fecha = m.Fecha,
                 Categoria = m.Categoria,
                 Cuenta = m.Cuenta,
-                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL),2),
+                CantidadDivisa = m.CantidadDivisa,
+                Divisa = m.Divisa,
                 Comentario = m.Comentario,
-                TipoMovimiento = m.TipoMovimiento
+                TipoMovimiento = m.TipoMovimiento,
+                ValorCCL = m.ValorCCL,
+                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2)
+
             }).ToList();
         }
 
@@ -54,6 +58,11 @@ namespace Application.Services
         public async Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad, string xValorCCL)
         {
             return await _ContabilidadRepository.InsertarContabilidadPersonalAsync(xContabilidad, xValorCCL);
+        }
+
+        public async Task<int> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
+        {
+            return await _ContabilidadRepository.EditarContabilidadPersonalAsync(xContabilidad);
         }
     }
 }
