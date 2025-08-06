@@ -47,7 +47,7 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpPost("transacciones/editar")]
-        public async Task<IActionResult> Editar([FromBody] ContabilidadDto transaccion)
+        public async Task<IActionResult> Editar([FromBody] ContabilidadUpdateDto transaccion)
         {
             if (transaccion == null)
             {
@@ -84,15 +84,54 @@ namespace UI.WalletWeb.Controllers
                 BadRequest(); 
         }
 
-        [HttpPost("transacciones/eliminar")]
-        public IActionResult Eliminar([FromBody] EliminarDto eliminar)
+        [HttpPost("transacciones/crear")]
+        public async Task<IActionResult> Insertar([FromBody] ContabilidadDto transaccion)
         {
-            var transaccion = ""; //Llamar repository para eliminar 
-            if (transaccion != null)
+            if (transaccion == null)
             {
-                return Json(new { success = true });
+                return BadRequest("La transacción enviada es nula.");
             }
-            return Json(new { success = false });
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+
+                return BadRequest(new { errors });
+            }
+
+            // Validaciones y lógica
+            var editContabilidad = new Contabilidad()
+            {
+                Fecha = transaccion.Fecha,
+                CantidadDivisa = transaccion.CantidadDivisa,
+                Categoria = transaccion.Categoria,
+                Comentario = transaccion.Comentario,
+                Cuenta = transaccion.Cuenta,
+                Divisa = transaccion.Divisa,
+                TipoMovimiento = transaccion.TipoMovimiento,
+                ValorCCL = transaccion.ValorCCL
+            };
+
+            var transacciones = await _contabilidaService.InsertarContabilidadPersonalAsyncService(editContabilidad);
+            return transacciones == 1 ?
+                Ok() :
+                BadRequest();
+        }
+
+        [HttpPost("transacciones/eliminar")]
+        public async Task<IActionResult> Eliminar([FromBody] EliminarDto eliminar)
+        {
+            if (eliminar == null )
+            {
+                return BadRequest("La transacción enviada es nula.");
+            }
+            var transaccion = await _contabilidaService.EliminarContabilidadPersonalAsyncService(eliminar.Id);
+            return transaccion == 1 ?
+                Ok() :
+                BadRequest();
         }
 
 

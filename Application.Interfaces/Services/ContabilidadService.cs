@@ -64,5 +64,15 @@ namespace Application.Services
         {
             return await _ContabilidadRepository.EditarContabilidadPersonalAsync(xContabilidad);
         }
+
+        public async Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
+        {
+            return await _ContabilidadRepository.InsertarContabilidadPersonalAsync(xContabilidad);
+        }
+
+        public async Task<int> EliminarContabilidadPersonalAsyncService(int xId)
+        {
+            return await _ContabilidadRepository.EliminarContabilidadPersonalAsync(xId);
+        }
     }
 }

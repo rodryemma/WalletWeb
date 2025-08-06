@@ -16,5 +16,7 @@ namespace Domain.Model.Interfaces
         DataTable ObtenerContabilidadDBFull();
         Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad, string xValorCCL);
         Task<int> EditarContabilidadPersonalAsync(Contabilidad xContabilidad);
+        Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad);
+        Task<int> EliminarContabilidadPersonalAsync(int xId);
     }
 }

@@ -23,6 +23,9 @@
     <input type="date" id="fechaHasta">
 </div>
 
+<div>
+    <button class="btn-crear btn btn-sm btn-primary" id="btn-crear">Crear</button>
+</div>
 
 <div>
     <table id="tablaTransacciones" class="display">
@@ -108,11 +111,6 @@
                             <input type="number" step="any" class="form-control" id="editarValorCCL" required />
                         </div>
 
-                        @* <div class="col-md-6 mb-2">
-                            <label for="editarMontoUsd" class="form-label">Monto USD</label>
-                            <input type="number" step="any" class="form-control" id="editarMontoUsd" required />
-                        </div> *@
-
                         <div class="col-md-6 mb-2">
                             <label for="editarTipoMovimiento" class="form-label">Tipo Movimiento</label>
                             <select class="form-control" id="editarTipoMovimiento">
@@ -133,6 +131,73 @@
 </div>
 
 
+<!-- Modal de creación -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="tituloCrear">Crear transacción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-3">
+                <form id="formCrear">
+                    @* <input type="hidden" id="crearId" /> *@
+
+                    <div class="row">
+                        <div class="col-md-6 mb-2">
+                            <label for="crearFecha" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="crearFecha" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearCategoria" class="form-label">Categoría</label>
+                            <input type="text" class="form-control" id="crearCategoria" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearCuenta" class="form-label">Cuenta</label>
+                            <input type="text" class="form-control" id="crearCuenta" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearCantidadDivisa" class="form-label">Cantidad Divisa</label>
+                            <input type="number" step="any" class="form-control" id="crearCantidadDivisa" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearDivisa" class="form-label">Divisa</label>
+                            <input type="text" class="form-control" id="crearDivisa" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearComentario" class="form-label">Comentario</label>
+                            <input type="text" class="form-control" id="crearComentario" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearValorCCL" class="form-label">Valor CCL</label>
+                            <input type="number" step="any" class="form-control" id="crearValorCCL" required />
+                        </div>
+
+                        <div class="col-md-6 mb-2">
+                            <label for="crearTipoMovimiento" class="form-label">Tipo Movimiento</label>
+                            <select class="form-control" id="crearTipoMovimiento">
+                                <option value="ingresos">Ingresos</option>
+                                <option value="gastos">Gastos</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="btnGuardarNuevo">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
 }
@@ -142,6 +207,7 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
     <script>
+        // Región: Cargar DataTable
         $(document).ready(function () {
             $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
             let fechaDesde = $('#fechaDesde').val();
@@ -232,16 +298,8 @@
             });
         });
 
-
         let idAEliminar = null;
-
-        // $('#tablaTransacciones').on('click', '.btn-eliminar', function () {
-        //     // var id = $(this).data('id');
-        //     idAEliminar = $(this).data('id');
-        //     const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
-        //     modal.show();
-        // });
-
+        // Región: Botón Eliminar
         document.querySelector('#tablaTransacciones').addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-eliminar')) {
                 idAEliminar = e.target.dataset.id;
@@ -252,31 +310,7 @@
             }
         });
 
-
-        // $('#btnConfirmarEliminar').on('click', function () {
-        //     // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
-        //     if (idAEliminar !== null) {
-        //         //console.log('Eliminar ID:', idAEliminar);
-        //         const data = { id : idAEliminar };
-        //         $.ajax({
-        //             url: `/transacciones/eliminar`,
-        //             method: 'POST',
-        //             contentType: 'application/json',
-        //             data: JSON.stringify(data),
-        //             success: function () {
-        //                 $('#tablaTransacciones').DataTable().ajax.reload();
-        //                 idAEliminar = null;
-        //                 const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
-        //                 modal.hide();
-        //                 // TODO Opcional: mostrar un toast o mensaje de éxito
-        //             },
-        //             error: function () {
-        //                 alert("Error al eliminar el registro.");
-        //             }
-        //         });
-        //     }
-        // });
-
+        // Región: Post Eliminar
         document.addEventListener('DOMContentLoaded', function () {
             const btnEliminar = document.getElementById('btnConfirmarEliminar');
 
@@ -293,9 +327,25 @@
                         },
                         body: JSON.stringify(data)
                     })
-                    .then(response => {
-                        if (!response.ok) throw new Error('Error al eliminar');
-                        return response.text();
+                    .then(async response => {
+
+                        const contentType = response.headers.get('content-type');
+                        const isJson = contentType && contentType.includes('application/json');
+
+                        if (!response.ok) {
+                            const errorData = isJson ? await response.json() : await response.text();
+                        
+                            let mensajeError = 'Error en la respuesta';
+                            if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
+                                mensajeError = errorData.errors.join('\n');
+                            } else if (typeof errorData === 'string') {
+                                mensajeError = errorData;
+                            }
+                        
+                            throw new Error(mensajeError);
+                        }
+                        return isJson ? await response.json() : null;
+
                     })
                     .then(() => {
                         if (window.$ && $.fn.DataTable) {
@@ -310,8 +360,7 @@
                         mostrarToast('Registro eliminado correctamente', 'success');
                     })
                     .catch(error => {
-                        console.error('Error al eliminar:', error);
-                        //mostrarToast('Error al eliminar el registro', 'danger');
+                        console.error('Error al guardar:', error);
                         mostrarToast(error.message, 'danger');
 
                     })
@@ -322,29 +371,7 @@
             });
         });
 
-        // $('#tablaTransacciones').on('click', '.btn-editar', function () {
-        //     const id = $(this).data('id');
-
-        //     const row = $('#tablaTransacciones').DataTable().row($(this).parents('tr')).data();
-
-        //     const fechaFormateada = row.fecha.toString().split('T')[0];
-        //     // TODO console.log("Valor crudo de Fecha:", row.id);
-        //     // Llenamos los campos del modal con los datos
-        //     $('#editarId').val(row.id);
-        //     $('#editarFecha').val(fechaFormateada);
-        //     $('#editarCategoria').val(row.categoria);
-        //     $('#editarCuenta').val(row.cuenta);
-        //     $('#editarCantidadDivisa').val(row.cantidadDivisa);
-        //     $('#editarDivisa').val(row.divisa);
-        //     $('#editarComentario').val(row.comentario);
-        //     $('#editarTipoMovimiento').val(row.tipoMovimiento);
-        //     $('#editarValorCCL').val(row.valorCCL);
-        //     $('#editarMontoUsd').val(row.montoUsd);
-
-        //     const modal = new bootstrap.Modal(document.getElementById('modalEditar'));
-        //     modal.show();
-        // });
-
+        // Región: Botón Editar
         document.addEventListener('DOMContentLoaded', function () {
             const tabla = document.getElementById('tablaTransacciones');
 
@@ -386,37 +413,7 @@
             });
         });
 
-        // $('#btnGuardarCambios').on('click', function () {
-        //     // TODO deshabilitar el boton o buscar la manera de no enviar varias peticiones
-        //     const data = {
-        //         Id: $('#editarId').val(),
-        //         Fecha: $('#editarFecha').val(),
-        //         Categoria: $('#editarCategoria').val(),
-        //         Cuenta: $('#editarCuenta').val(),
-        //         CantidadDivisa: $('#editarCantidadDivisa').val(),
-        //         Divisa: $('#editarDivisa').val(),
-        //         Comentario: $('#editarComentario').val(),
-        //         TipoMovimiento: $('#editarTipoMovimiento').val(),
-        //         ValorCCL: $('#editarValorCCL').val(),
-        //         MontoUsd: parseFloat($('#editarMontoUsd').val())
-        //     };
-
-        //     $.ajax({
-        //         url: '/transacciones/editar',
-        //         method: 'POST',
-        //         contentType: 'application/json',
-        //         data: JSON.stringify(data),
-        //         success: function () {
-        //             $('#tablaTransacciones').DataTable().ajax.reload();
-        //             const modal = bootstrap.Modal.getInstance(document.getElementById('modalEditar'));
-        //             modal.hide();
-        //         },
-        //         error: function () {
-        //             alert('Error al guardar los cambios.');
-        //         }
-        //     });
-        // });
-
+        // Región: Post Editar
         document.addEventListener('DOMContentLoaded', function () {
             const btnGuardar = document.getElementById('btnGuardarCambios');
             const form = document.getElementById("formEditar");
@@ -453,13 +450,6 @@
                     body: JSON.stringify(data)
                 })
                 .then(async response => {
-                    // if (!response.ok) throw new Error('Error en la respuesta');
-                    
-                    // const contentType = response.headers.get('content-type');
-                    // if (contentType && contentType.includes('application/json')) {
-                    //     return await response.json();
-                    // }
-                    // return null;
                     
                     const contentType = response.headers.get('content-type');
                     const isJson = contentType && contentType.includes('application/json');
@@ -494,8 +484,6 @@
                 })
                 .catch(error => {
                     console.error('Error al guardar:', error);
-                    // alert('Error al guardar los cambios.');
-                    //mostrarToast('Error al guardar', 'danger');
                     mostrarToast(error.message, 'danger');
 
                 })
@@ -505,7 +493,93 @@
             });
         });
 
-        
+        // Región: Botón Crear
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnCrear = document.getElementById('btn-crear');
+
+            btnCrear.addEventListener('click', function () {
+                const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
+                modalCrear.show();                
+            });
+        });
+
+        // Región: Post Crear
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnGuardar = document.getElementById('btnGuardarNuevo');
+            const form = document.getElementById("formCrear");
+
+            //Validar formulario "formCrear"
+            btnGuardar.addEventListener('click', function () {
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Desactivar el botón para evitar múltiples envíos
+                btnGuardar.disabled = true;
+
+                const data = {
+                    Fecha: document.getElementById('crearFecha').value,
+                    Categoria: document.getElementById('crearCategoria').value,
+                    Cuenta: document.getElementById('crearCuenta').value,
+                    CantidadDivisa: document.getElementById('crearCantidadDivisa').value,
+                    Divisa: document.getElementById('crearDivisa').value,
+                    Comentario: document.getElementById('crearComentario').value,
+                    TipoMovimiento: document.getElementById('crearTipoMovimiento').value,
+                    ValorCCL: document.getElementById('crearValorCCL').value
+                };
+
+                fetch('/transacciones/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then(async response => {
+
+                    const contentType = response.headers.get('content-type');
+                    const isJson = contentType && contentType.includes('application/json');
+
+                    if (!response.ok) {
+                        const errorData = isJson ? await response.json() : await response.text();
+
+                        let mensajeError = 'Error en la respuesta';
+                        if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
+                            mensajeError = errorData.errors.join('\n');
+                        } else if (typeof errorData === 'string') {
+                            mensajeError = errorData;
+                        }
+
+                        throw new Error(mensajeError);
+                    }
+
+                    return isJson ? await response.json() : null;
+                })
+                .then(result => {
+                    // Recargar DataTable (si seguís usando jQuery solo para eso)
+                    if (window.$ && $.fn.DataTable) {
+                        $('#tablaTransacciones').DataTable().ajax.reload();
+                    }
+
+                    // Cerrar el modal de Bootstrap
+                    const modalElement = document.getElementById('modalCrear');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    mostrarToast('Cambios guardados correctamente', 'success');
+                })
+                .catch(error => {
+                    console.error('Error al guardar:', error);
+                    mostrarToast(error.message, 'danger');
+
+                })
+                .finally(() => {
+                    btnGuardar.disabled = false;
+                });
+            });
+        });
 
 
 

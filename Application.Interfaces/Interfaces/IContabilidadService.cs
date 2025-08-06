@@ -17,5 +17,7 @@ namespace Application.Interfaces
         DataTable ObtenerContabilidadDBFullService();
         Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad, string xValorCCL);
         Task<int> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
+        Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
+        Task<int> EliminarContabilidadPersonalAsyncService(int xId);
     }
 }

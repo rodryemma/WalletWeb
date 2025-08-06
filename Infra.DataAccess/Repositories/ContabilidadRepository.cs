@@ -311,5 +311,96 @@ namespace Infra.DataAccess.Repository
             return respt;
         }
 
+        public async Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad)
+        {
+            int respt = 0;
+
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+                    string sqlString = @"INSERT INTO ContabilidadPersonal (                                          
+                                          Fecha,
+                                          Cateria,
+                                          Cuenta,
+                                          CantidadDivisa,
+                                          Divisa,
+                                          Comentario,
+                                          TipoMovimiento,
+                                          ValorCCL)
+                                         VALUES (
+                                          @Fecha,
+                                          @Categoria,
+                                          @Cuenta,
+                                          @CantidadDivisa,
+                                          @Divisa,
+                                          @Comentario,
+                                          @TipoMovimiento,
+                                          @ValorCCL)";
+
+
+                    using (MySqlCommand comando = new MySqlCommand(sqlString, c))
+                    {
+                        comando.Parameters.AddWithValue("@Fecha", xContabilidad.Fecha.ToString("yyyy-MM-dd HH:mm:ss"));
+                        comando.Parameters.AddWithValue("@Categoria", xContabilidad.Categoria);
+                        comando.Parameters.AddWithValue("@Cuenta", xContabilidad.Cuenta);
+                        comando.Parameters.AddWithValue("@CantidadDivisa", xContabilidad.CantidadDivisa);
+                        comando.Parameters.AddWithValue("@Divisa", xContabilidad.Divisa);
+                        comando.Parameters.AddWithValue("@Comentario", xContabilidad.Comentario);
+                        comando.Parameters.AddWithValue("@TipoMovimiento", xContabilidad.TipoMovimiento);
+                        comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
+
+                        await comando.ExecuteNonQueryAsync();
+                        respt = 1;
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    // log o manejo del error
+                    respt = 0;
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+
+            return respt;
+        }
+
+        public async Task<int> EliminarContabilidadPersonalAsync(int xId)
+        {
+            int respt = 0;
+
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+                    string sqlString = @"DELETE FROM ContabilidadPersonal
+                                          WHERE Id = @Id";
+
+
+                    using (MySqlCommand comando = new MySqlCommand(sqlString, c))
+                    {
+                        comando.Parameters.AddWithValue("@Id", xId);
+
+                        await comando.ExecuteNonQueryAsync();
+                        respt = 1;
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    // log o manejo del error
+                    respt = 0;
+                }
+                finally
+                {
+                    c.Close();
+                }
+            }
+
+            return respt;
+        }
+
     }
 }
