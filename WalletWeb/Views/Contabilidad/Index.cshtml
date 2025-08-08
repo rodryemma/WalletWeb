@@ -5,6 +5,10 @@
 
 <h2>Transacciones</h2>
 
+<div>
+    <label>Dolar CCL: <span id="valorDolar">0.00</span></label>
+</div>
+
 <p>Total en USD: <span id="totalMonto">0.00</span></p>
 
 <div>
@@ -207,6 +211,24 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
     <script>
+        // Región: Cargar DolarCCL
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                const response = await fetch('/ccl/json');
+
+                if (!response.ok) {
+                    throw new Error("Error en la petición");
+                }
+
+                const data = await response.json();
+
+                document.getElementById("valorDolar").textContent = data.ccl;
+            } catch (error) {
+                console.error(error);
+                document.getElementById("valorDolar").textContent = "Error al cargar";
+            }
+        });
+
         // Región: Cargar Date Desde y Hasta
         document.addEventListener('DOMContentLoaded', function () {
         const hoy = new Date();

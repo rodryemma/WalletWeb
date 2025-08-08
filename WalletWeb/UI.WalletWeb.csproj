@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Application.Interfaces\Application.csproj" />
     <ProjectReference Include="..\Domain.Entity\Domain.Model.csproj" />
+    <ProjectReference Include="..\ExternalServices\Infra.ExternalServices.csproj" />
     <ProjectReference Include="..\Infra.DataAccess\Infra.DataAccess.csproj" />
     <ProjectReference Include="..\Shared\Shared.csproj" />
   </ItemGroup>
