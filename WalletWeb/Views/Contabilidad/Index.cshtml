@@ -207,6 +207,22 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
     <script>
+        // Región: Cargar Date Desde y Hasta
+        document.addEventListener('DOMContentLoaded', function () {
+        const hoy = new Date();
+
+        const fechaHasta = hoy.toISOString().split('T')[0];
+
+        const unMesAntes = new Date(hoy);
+        unMesAntes.setMonth(unMesAntes.getMonth() - 3);
+        unMesAntes.setDate(1);
+
+        const fechaDesde = unMesAntes.toISOString().split('T')[0];
+
+        document.getElementById('fechaDesde').value = fechaDesde;
+        document.getElementById('fechaHasta').value = fechaHasta;
+        });
+
         // Región: Cargar DataTable
         $(document).ready(function () {
             $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
@@ -228,7 +244,9 @@
                 $('#tablaTransacciones').DataTable().draw();
             });
 
-            var tabla = $('#tablaTransacciones').DataTable({
+            //const data = { tipoMovimiento: $('#tipoMovimientoSelect').val() };
+
+            let tabla = $('#tablaTransacciones').DataTable({
                 responsive: true,
                 paging: true,
                 destroy: true,
@@ -238,7 +256,8 @@
                 ajax: {
                     url: '/transacciones/json',
                     data: function (d) {
-                         d.tipoMovimiento = $('#tipoMovimientoSelect').val();
+                         d.tipoMovimiento = $('#tipoMovimientoSelect').val(),
+                         d.fecha = $('#fechaDesde').val();
                     }
                 },
                 order: [[0, 'desc']],//Fecha de forma descendente
@@ -293,8 +312,24 @@
                     }
             });
 
+            //Recargar table por tipomovimiento
             $('#tipoMovimientoSelect').change(function () {
             tabla.ajax.reload();
+            });
+
+            //Recargar table por fecha desde anterior
+            let fechaInicial = new Date(document.getElementById('fechaDesde').value);
+
+            document.getElementById('fechaDesde').addEventListener('change', function () {
+                const nuevaFechaStr = this.value;
+                if (!nuevaFechaStr) return;
+                
+                const nuevaFecha = new Date(nuevaFechaStr);
+                
+                if (nuevaFecha < fechaInicial) {
+                    fechaInicial = nuevaFecha;
+                    tabla.ajax.reload();
+                }
             });
         });
 

@@ -2,6 +2,7 @@
 using Domain.Model.Interfaces;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -71,20 +72,20 @@ namespace Infra.DataAccess.Repository
 
         }
 
-        public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsync(string xTipo)
+        public async Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadDBFullAsync(string xTipo)
         {
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
                     
-                    var baseSql = "SELECT * FROM ContabilidadPersonal";
+                    var baseSql = "SELECT * FROM ContabilidadPersonal ";
                     var whereClause = "";
                     var parametros = new List<MySqlParameter>();
 
                     if (!string.Equals(xTipo, "total", StringComparison.OrdinalIgnoreCase))
                     {
-                        whereClause = " WHERE TipoMovimiento = @Tipo";
+                        whereClause = " WHERE TipoMovimiento = @Tipo ";
                         parametros.Add(new MySqlParameter("@Tipo", xTipo.ToLower()));
                     }
 
@@ -102,89 +103,87 @@ namespace Infra.DataAccess.Repository
                             {
                                 query.Add(new Contabilidad()
                                 {
-                                    Id = int.Parse(reader["Id"].ToString()),
-                                    Fecha = Convert.ToDateTime(reader["Fecha"].ToString()),
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
                                     Categoria = reader["Cateria"].ToString(),
                                     Cuenta = reader["Cuenta"].ToString(),
-                                    CantidadDivisa = float.Parse(reader["CantidadDivisa"].ToString()),
+                                    CantidadDivisa = reader.GetFloat("CantidadDivisa"),
                                     Divisa = reader["Divisa"].ToString(),
                                     Comentario = reader["Comentario"].ToString(),
                                     TipoMovimiento = reader["TipoMovimiento"].ToString(),
-                                    ValorCCL = float.Parse(reader["ValorCCL"].ToString())
+                                    ValorCCL = reader.GetFloat("ValorCCL")
                                 });
 
                             }
-                            return query;
+                            return OperationResult<List<Contabilidad>>.Ok(query);
                         }
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    //TODO
-                    //MessageBox.Show("Se ha producido un error: " + ex.Message);
-                    return null;
+                    return OperationResult<List<Contabilidad>>.Fail("Error al eliminar: " + ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    //TODO
-                    //MessageBox.Show("Se ha producido un error: " + ex.Message);
-                    return null;
-                }
-                finally
-                {
-                    c.Close();
+                    return OperationResult<List<Contabilidad>>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
 
         }
 
-        public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsync(string xTipo, DateTime xFechaDesde)
+        public async Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadDBFullAsync(string xTipo, DateTime xFechaDesde)
         {
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
-                    var sqlString = $"SELECT * FROM ContabilidadPersonal " +
-                        $"WHERE TipoMovimiento = '{xTipo.ToLower()}' " +
-                        $"AND Fecha >= '{xFechaDesde.ToString("yyyy-MM-dd HH:mm:ss")}' " +
-                        $"ORDER BY Fecha DESC";
-
-                    MySqlCommand Comando = new MySqlCommand(sqlString, c);
-                    MySqlDataReader reader = await Comando.ExecuteReaderAsync();
-                    List<Contabilidad> query = new List<Contabilidad>();
-                    while (await reader.ReadAsync())
+                    var baseSql = "SELECT * FROM ContabilidadPersonal WHERE  Fecha >=@Fecha ";
+                    var whereClause = "";
+                    var parametros = new List<MySqlParameter>();
+                    parametros.Add(new MySqlParameter("@Fecha", xFechaDesde.ToString("yyyy-MM-dd HH:mm:ss")));
+                    if (!string.Equals(xTipo, "total", StringComparison.OrdinalIgnoreCase))
                     {
-                        query.Add(new Contabilidad()
-                        {
-                            Id = int.Parse(reader["Id"].ToString()),
-                            Fecha = Convert.ToDateTime(reader["Fecha"].ToString()),
-                            Categoria = reader["Cateria"].ToString(),
-                            Cuenta = reader["Cuenta"].ToString(),
-                            CantidadDivisa = float.Parse(reader["CantidadDivisa"].ToString()),
-                            Divisa = reader["Divisa"].ToString(),
-                            Comentario = reader["Comentario"].ToString(),
-                            TipoMovimiento = reader["TipoMovimiento"].ToString(),
-                            ValorCCL = float.Parse(reader["ValorCCL"].ToString())
-                        });
-
+                        whereClause = " AND TipoMovimiento = @Tipo";
+                        parametros.Add(new MySqlParameter("@Tipo", xTipo.ToLower()));
                     }
-                    return query;
+
+                    var sqlString = $"{baseSql}{whereClause} ORDER BY Fecha DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        if (parametros.Any())
+                            Comando.Parameters.AddRange(parametros.ToArray());
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Contabilidad> query = new List<Contabilidad>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Contabilidad()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
+                                    Categoria = reader["Cateria"].ToString(),
+                                    Cuenta = reader["Cuenta"].ToString(),
+                                    CantidadDivisa = reader.GetFloat("CantidadDivisa"),
+                                    Divisa = reader["Divisa"].ToString(),
+                                    Comentario = reader["Comentario"].ToString(),
+                                    TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                    ValorCCL = reader.GetFloat("ValorCCL")
+                                });
+
+                            }
+                            return OperationResult<List<Contabilidad>>.Ok(query);
+                        }
+                    }
                 }
                 catch (MySqlException ex)
                 {
-                    //TODO
-                    //MessageBox.Show("Se ha producido un error: " + ex.Message);
-                    return null;
+                    return OperationResult<List<Contabilidad>>.Fail("Error al eliminar: " + ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    //TODO
-                    //MessageBox.Show("Se ha producido un error: " + ex.Message);
-                    return null;
-                }
-                finally
-                {
-                    c.Close();
+                    return OperationResult<List<Contabilidad>>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
 
@@ -261,9 +260,8 @@ namespace Infra.DataAccess.Repository
             return respt;
         }
 
-        public async Task<int> EditarContabilidadPersonalAsync(Contabilidad xContabilidad)
+        public async Task<OperationResult<int>> EditarContabilidadPersonalAsync(Contabilidad xContabilidad)
         {
-            int respt = 0;
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
@@ -293,27 +291,23 @@ namespace Infra.DataAccess.Repository
                         comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
                         comando.Parameters.AddWithValue("@Id", xContabilidad.Id);
 
-                        await comando.ExecuteNonQueryAsync();
-                        respt = 1;
+                        var filasRta = await comando.ExecuteNonQueryAsync();
+
+                        if (filasRta > 0)
+                            return OperationResult<int>.Ok(filasRta, "Editado correctamente");
+                        else
+                            return OperationResult<int>.Fail("No se editó el registro");
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    // log o manejo del error
-                    respt = 0;
-                }
-                finally
-                {
-                    c.Close();
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
-
-            return respt;
         }
 
-        public async Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad)
+        public async Task<OperationResult<int>> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad)
         {
-            int respt = 0;
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
@@ -350,27 +344,23 @@ namespace Infra.DataAccess.Repository
                         comando.Parameters.AddWithValue("@TipoMovimiento", xContabilidad.TipoMovimiento);
                         comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
 
-                        await comando.ExecuteNonQueryAsync();
-                        respt = 1;
+                        var filasRta = await comando.ExecuteNonQueryAsync();
+
+                        if (filasRta > 0)
+                            return OperationResult<int>.Ok(filasRta, "Insertado correctamente");
+                        else
+                            return OperationResult<int>.Fail("No se insertó el registro");
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    // log o manejo del error
-                    respt = 0;
-                }
-                finally
-                {
-                    c.Close();
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
-
-            return respt;
         }
 
-        public async Task<int> EliminarContabilidadPersonalAsync(int xId)
+        public async Task<OperationResult<int>> EliminarContabilidadPersonalAsync(int xId)
         {
-            int respt = 0;
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
@@ -379,27 +369,25 @@ namespace Infra.DataAccess.Repository
                     string sqlString = @"DELETE FROM ContabilidadPersonal
                                           WHERE Id = @Id";
 
-
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
                     {
                         comando.Parameters.AddWithValue("@Id", xId);
 
-                        await comando.ExecuteNonQueryAsync();
-                        respt = 1;
+                        int filasRta = await comando.ExecuteNonQueryAsync();
+
+                        if (filasRta > 0)
+                            return OperationResult<int>.Ok(filasRta, "Eliminado correctamente");
+                        else
+                            return OperationResult<int>.Fail("No se encontró el registro para eliminar");
+
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    // log o manejo del error
-                    respt = 0;
-                }
-                finally
-                {
-                    c.Close();
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
 
-            return respt;
         }
 
     }

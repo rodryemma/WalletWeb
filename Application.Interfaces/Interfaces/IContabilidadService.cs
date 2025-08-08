@@ -1,5 +1,6 @@
 ﻿using Application.DTOs;
 using Domain.Model.Entity;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,12 +13,12 @@ namespace Application.Interfaces
     public interface IContabilidadService
     {
         List<Contabilidad> ObtenerContabilidadDBFullService(string xTipo);
-        Task<List<ContabilidadDto>> ObtenerContabilidadDBFullAsyncService(string xTipo);
-        Task<List<Contabilidad>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde);
+        Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo);
+        Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde);
         DataTable ObtenerContabilidadDBFullService();
         Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad, string xValorCCL);
-        Task<int> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
-        Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
-        Task<int> EliminarContabilidadPersonalAsyncService(int xId);
+        Task<OperationResult<int>> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
+        Task<OperationResult<int>> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
+        Task<OperationResult<int>> EliminarContabilidadPersonalAsyncService(int xId);
     }
 }

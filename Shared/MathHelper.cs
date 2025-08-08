@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Common
+namespace Shared
 {
-    internal class MathHelper
+    public class MathHelper
     {
         public static T Dividir<T>(T numerator, T denominator) where T : struct
         {

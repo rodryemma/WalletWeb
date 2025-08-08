@@ -2,7 +2,9 @@
 using Application.Interfaces;
 using Domain.Model.Entity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using System.CodeDom;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -24,10 +26,15 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpGet("transacciones/json")]
-        public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total")
+        public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
         {
-            var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower());
-            var lista = transacciones.Select(x => new {
+            var FechaObtenida = ValidationHelper.ValidarFecha(fecha);
+            //var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower());
+            var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida);
+            if (!transacciones.Success) { return BadRequest(transacciones.Message); }
+
+            var lista = transacciones.Data.Select(x => new
+            {
                 x.Id,
                 Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
                 x.Categoria,
@@ -41,9 +48,9 @@ namespace UI.WalletWeb.Controllers
             }).ToList();
             return Json(new
             {
-                data = transacciones
+                data = lista
             });
-
+        
         }
 
         [HttpPost("transacciones/editar")]
@@ -78,10 +85,10 @@ namespace UI.WalletWeb.Controllers
                 ValorCCL = transaccion.ValorCCL
             };
 
-            var transacciones = await _contabilidaService.EditarContabilidadPersonalAsyncService(editContabilidad);            
-            return transacciones == 1 ? 
+            var transacciones = await _contabilidaService.EditarContabilidadPersonalAsyncService(editContabilidad);
+            return transacciones.Success ?
                 Ok() :
-                BadRequest(); 
+                BadRequest(transacciones.Message);
         }
 
         [HttpPost("transacciones/crear")]
@@ -116,22 +123,22 @@ namespace UI.WalletWeb.Controllers
             };
 
             var transacciones = await _contabilidaService.InsertarContabilidadPersonalAsyncService(editContabilidad);
-            return transacciones == 1 ?
+            return transacciones.Success ?
                 Ok() :
-                BadRequest();
+                BadRequest(transacciones.Message);
         }
 
         [HttpPost("transacciones/eliminar")]
         public async Task<IActionResult> Eliminar([FromBody] EliminarDto eliminar)
         {
-            if (eliminar == null )
+            if (eliminar == null)
             {
                 return BadRequest("La transacción enviada es nula.");
             }
             var transaccion = await _contabilidaService.EliminarContabilidadPersonalAsyncService(eliminar.Id);
-            return transaccion == 1 ?
+            return transaccion.Success ?
                 Ok() :
-                BadRequest();
+                BadRequest(transaccion.Message);
         }
 
 

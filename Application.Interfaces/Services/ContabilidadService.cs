@@ -1,4 +1,4 @@
-﻿using Application.Common;
+﻿using Shared ;
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Model.Entity;
@@ -26,10 +26,13 @@ namespace Application.Services
             return _ContabilidadRepository.ObtenerContabilidadDBFull(xTipo);
         }
 
-        public async Task<List<ContabilidadDto>> ObtenerContabilidadDBFullAsyncService(string xTipo)
+        public async Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo)
         {
             var contabilidadMovimientos = await _ContabilidadRepository.ObtenerContabilidadDBFullAsync(xTipo);
-            return contabilidadMovimientos.Select(m => new ContabilidadDto
+
+            if (!contabilidadMovimientos.Success) { return OperationResult<List<ContabilidadDto>>.Fail( contabilidadMovimientos.Message); }
+
+            var movimiento = contabilidadMovimientos.Data.Select(m => new ContabilidadDto
             {
                 Id = m.Id,
                 Fecha = m.Fecha,
@@ -43,11 +46,29 @@ namespace Application.Services
                 MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2)
 
             }).ToList();
+            return OperationResult<List<ContabilidadDto>>.Ok(movimiento);
         }
 
-        public async Task<List<Contabilidad>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde)
+        public async Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde)
         {
-            return await _ContabilidadRepository.ObtenerContabilidadDBFullAsync(xTipo, xFechaDesde);
+            var contabilidadMovimientos = await _ContabilidadRepository.ObtenerContabilidadDBFullAsync(xTipo, xFechaDesde);
+            if (!contabilidadMovimientos.Success) { return OperationResult<List<ContabilidadDto>>.Fail(contabilidadMovimientos.Message); }
+
+            var movimiento = contabilidadMovimientos.Data.Select(m => new ContabilidadDto
+            {
+                Id = m.Id,
+                Fecha = m.Fecha,
+                Categoria = m.Categoria,
+                Cuenta = m.Cuenta,
+                CantidadDivisa = m.CantidadDivisa,
+                Divisa = m.Divisa,
+                Comentario = m.Comentario,
+                TipoMovimiento = m.TipoMovimiento,
+                ValorCCL = m.ValorCCL,
+                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2)
+
+            }).ToList();
+            return OperationResult<List<ContabilidadDto>>.Ok(movimiento);
         }
 
         public DataTable ObtenerContabilidadDBFullService()
@@ -60,17 +81,17 @@ namespace Application.Services
             return await _ContabilidadRepository.InsertarContabilidadPersonalAsync(xContabilidad, xValorCCL);
         }
 
-        public async Task<int> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
+        public async Task<OperationResult<int>> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
         {
             return await _ContabilidadRepository.EditarContabilidadPersonalAsync(xContabilidad);
         }
 
-        public async Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
+        public async Task<OperationResult<int>> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
         {
             return await _ContabilidadRepository.InsertarContabilidadPersonalAsync(xContabilidad);
         }
 
-        public async Task<int> EliminarContabilidadPersonalAsyncService(int xId)
+        public async Task<OperationResult<int>> EliminarContabilidadPersonalAsyncService(int xId)
         {
             return await _ContabilidadRepository.EliminarContabilidadPersonalAsync(xId);
         }
