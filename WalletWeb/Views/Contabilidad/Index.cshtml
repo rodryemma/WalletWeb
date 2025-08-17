@@ -75,7 +75,7 @@
                 <h5 class="modal-title" id="tituloEditar">Editar transacción</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body p-3">              
+            <div class="modal-body p-3">
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
 
@@ -134,7 +134,6 @@
     </div>
 </div>
 
-
 <!-- Modal de creación -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
     <div class="modal-dialog">
@@ -180,7 +179,15 @@
 
                         <div class="col-md-6 mb-2">
                             <label for="crearValorCCL" class="form-label">Valor CCL</label>
-                            <input type="number" step="any" class="form-control" id="crearValorCCL" required />
+                            <div class="input-group">
+                                <input type="number" step="any" class="form-control" id="crearValorCCL" required />
+                                <span class="input-group-text" id="buton-ccl" style="cursor: pointer;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-clockwise" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2z"></path>
+                                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466"></path>
+                                    </svg>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="col-md-6 mb-2">
@@ -211,39 +218,57 @@
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
 
     <script>
-        // Región: Cargar DolarCCL
+
         document.addEventListener("DOMContentLoaded", async () => {
+            cargarDateDesdeHasta();
+            cargarModalEditar();
+            cargarModalCrear();
+
+            await cargarDolarCCL();
+            await actualizarBotonCcl();
+            await eliminarTransaccion();
+            await editarTransaccion();
+            await guardarTransaccion();
+        });
+
+        // Región: Cargar DolarCCL
+        async function cargarDolarCCL() {
             try {
-                const response = await fetch('/ccl/json');
-
-                if (!response.ok) {
-                    throw new Error("Error en la petición");
-                }
-
-                const data = await response.json();
-
+                const url = "/ccl/json";
+                const data = await apiRequest(url);
                 document.getElementById("valorDolar").textContent = data.ccl;
             } catch (error) {
                 console.error(error);
                 document.getElementById("valorDolar").textContent = "Error al cargar";
             }
-        });
+        }
+
+        // Región: Pedir DolarHistorico
+        async function cargarDolarHistorico(fechaInicio, fechaFinal) {
+            try {
+                const url = `/cclhistorico/json?fechaInicio=${encodeURIComponent(fechaInicio)}&fechaFinal=${encodeURIComponent(fechaFinal)}`;
+                return await apiRequest(url);
+
+            } catch (error) {
+                console.error(error);
+                mostrarToast(error.message, 'danger');
+            }
+        }
 
         // Región: Cargar Date Desde y Hasta
-        document.addEventListener('DOMContentLoaded', function () {
-        const hoy = new Date();
+        function cargarDateDesdeHasta(){
+            const hoy = new Date();
+            const fechaHasta = hoy.toISOString().split('T')[0];
+            const unMesAntes = new Date(hoy);
 
-        const fechaHasta = hoy.toISOString().split('T')[0];
+            unMesAntes.setMonth(unMesAntes.getMonth() - 3);
+            unMesAntes.setDate(1);
 
-        const unMesAntes = new Date(hoy);
-        unMesAntes.setMonth(unMesAntes.getMonth() - 3);
-        unMesAntes.setDate(1);
+            const fechaDesde = unMesAntes.toISOString().split('T')[0];
 
-        const fechaDesde = unMesAntes.toISOString().split('T')[0];
-
-        document.getElementById('fechaDesde').value = fechaDesde;
-        document.getElementById('fechaHasta').value = fechaHasta;
-        });
+            document.getElementById('fechaDesde').value = fechaDesde;
+            document.getElementById('fechaHasta').value = fechaHasta;
+        }
 
         // Región: Cargar DataTable
         $(document).ready(function () {
@@ -345,9 +370,9 @@
             document.getElementById('fechaDesde').addEventListener('change', function () {
                 const nuevaFechaStr = this.value;
                 if (!nuevaFechaStr) return;
-                
+
                 const nuevaFecha = new Date(nuevaFechaStr);
-                
+
                 if (nuevaFecha < fechaInicial) {
                     fechaInicial = nuevaFecha;
                     tabla.ajax.reload();
@@ -355,8 +380,8 @@
             });
         });
 
-        let idAEliminar = null;
         // Región: Botón Eliminar
+        let idAEliminar = null;        
         document.querySelector('#tablaTransacciones').addEventListener('click', function (e) {
             if (e.target.classList.contains('btn-eliminar')) {
                 idAEliminar = e.target.dataset.id;
@@ -368,68 +393,37 @@
         });
 
         // Región: Post Eliminar
-        document.addEventListener('DOMContentLoaded', function () {
+        async function eliminarTransaccion(){
             const btnEliminar = document.getElementById('btnConfirmarEliminar');
 
-            btnEliminar.addEventListener('click', function () {
+            btnEliminar.addEventListener('click', async () => {
                 if (typeof idAEliminar !== 'undefined' && idAEliminar !== null) {
                     btnEliminar.disabled = true;
-
                     const data = { id: idAEliminar };
-
-                    fetch('/transacciones/eliminar', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    })
-                    .then(async response => {
-
-                        const contentType = response.headers.get('content-type');
-                        const isJson = contentType && contentType.includes('application/json');
-
-                        if (!response.ok) {
-                            const errorData = isJson ? await response.json() : await response.text();
-                        
-                            let mensajeError = 'Error en la respuesta';
-                            if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
-                                mensajeError = errorData.errors.join('\n');
-                            } else if (typeof errorData === 'string') {
-                                mensajeError = errorData;
-                            }
-                        
-                            throw new Error(mensajeError);
-                        }
-                        return isJson ? await response.json() : null;
-
-                    })
-                    .then(() => {
+                    try {
+                        const url = "/transacciones/eliminar";
+                        await apiRequest(url, "POST", data);
                         if (window.$ && $.fn.DataTable) {
                             $('#tablaTransacciones').DataTable().ajax.reload();
                         }
-
                         idAEliminar = null;
 
                         const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
                         if (modal) modal.hide();
-                                                
+
                         mostrarToast('Registro eliminado correctamente', 'success');
-                    })
-                    .catch(error => {
+                    } catch(error) {
                         console.error('Error al guardar:', error);
                         mostrarToast(error.message, 'danger');
-
-                    })
-                    .finally(() => {
+                    } finally {
                         btnEliminar.disabled = false;
-                    });
+                    }
                 }
             });
-        });
+        }
 
-        // Región: Botón Editar
-        document.addEventListener('DOMContentLoaded', function () {
+        // Región: Botón Editar Abrir Modal
+        function cargarModalEditar(){
             const tabla = document.getElementById('tablaTransacciones');
 
             tabla.addEventListener('click', function (event) {
@@ -461,22 +455,21 @@
                     document.getElementById('editarComentario').value = row.comentario;
                     document.getElementById('editarTipoMovimiento').value = row.tipoMovimiento;
                     document.getElementById('editarValorCCL').value = row.valorCCL;
-                    //document.getElementById('editarMontoUsd').value = row.montoUsd;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
                     modalEditar.show();
                 }
             });
-        });
+        }
 
         // Región: Post Editar
-        document.addEventListener('DOMContentLoaded', function () {
+        async function editarTransaccion(){
             const btnGuardar = document.getElementById('btnGuardarCambios');
             const form = document.getElementById("formEditar");
 
             //Validar formulario "formEditar"
-            btnGuardar.addEventListener('click', function () {
+            btnGuardar.addEventListener('click', async () => {
 
                 if (!form.checkValidity()) {
                     form.reportValidity();
@@ -496,84 +489,62 @@
                     Comentario: document.getElementById('editarComentario').value,
                     TipoMovimiento: document.getElementById('editarTipoMovimiento').value,
                     ValorCCL: document.getElementById('editarValorCCL').value,
-                    //MontoUsd: parseFloat(document.getElementById('editarMontoUsd').value)
                 };
 
-                fetch('/transacciones/editar', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(async response => {
-                    
-                    const contentType = response.headers.get('content-type');
-                    const isJson = contentType && contentType.includes('application/json');
-                    
-                    if (!response.ok) {
-                        const errorData = isJson ? await response.json() : await response.text();
-                    
-                        let mensajeError = 'Error en la respuesta';
-                        if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
-                            mensajeError = errorData.errors.join('\n');
-                        } else if (typeof errorData === 'string') {
-                            mensajeError = errorData;
-                        }
-                    
-                        throw new Error(mensajeError);
-                    }
-                    
-                    return isJson ? await response.json() : null;
-                })               
-                .then(result => {
-                    // Recargar DataTable (si seguís usando jQuery solo para eso)
+                try  {
+                    const url = "/transacciones/editar";
+                    await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
                         $('#tablaTransacciones').DataTable().ajax.reload();
                     }
-
                     // Cerrar el modal de Bootstrap
                     const modalElement = document.getElementById('modalEditar');
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     modalInstance.hide();
 
                     mostrarToast('Cambios guardados correctamente', 'success');
-                })
-                .catch(error => {
+                } catch(error) {
                     console.error('Error al guardar:', error);
                     mostrarToast(error.message, 'danger');
-
-                })
-                .finally(() => {
+                } finally {
                     btnGuardar.disabled = false;
-                });
+                }
             });
-        });
+        }
 
-        // Región: Botón Crear
-        document.addEventListener('DOMContentLoaded', function () {
+        // Región: Botón Crear Abrir Modal
+        function cargarModalCrear(){
             const btnCrear = document.getElementById('btn-crear');
 
             btnCrear.addEventListener('click', function () {
+                const hoy = new Date();
+                const fechaHoy = hoy.toISOString().split('T')[0];
+                document.getElementById('crearFecha').value = fechaHoy;
+                document.getElementById('crearCategoria').value = "";
+                document.getElementById('crearCuenta').value = "";
+                document.getElementById('crearCantidadDivisa').value = "";
+                document.getElementById('crearDivisa').value = "";
+                document.getElementById('crearComentario').value = "";
+                document.getElementById('crearTipoMovimiento').value = "";
+                document.getElementById('crearValorCCL').value = "";
                 const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
-                modalCrear.show();                
+                modalCrear.show();
             });
-        });
+        }
 
         // Región: Post Crear
-        document.addEventListener('DOMContentLoaded', function () {
+        async function guardarTransaccion(){
             const btnGuardar = document.getElementById('btnGuardarNuevo');
             const form = document.getElementById("formCrear");
 
             //Validar formulario "formCrear"
-            btnGuardar.addEventListener('click', function () {
+            btnGuardar.addEventListener('click', async () => {
 
                 if (!form.checkValidity()) {
                     form.reportValidity();
                     return;
                 }
 
-                // Desactivar el botón para evitar múltiples envíos
                 btnGuardar.disabled = true;
 
                 const data = {
@@ -587,58 +558,47 @@
                     ValorCCL: document.getElementById('crearValorCCL').value
                 };
 
-                fetch('/transacciones/crear', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                })
-                .then(async response => {
-
-                    const contentType = response.headers.get('content-type');
-                    const isJson = contentType && contentType.includes('application/json');
-
-                    if (!response.ok) {
-                        const errorData = isJson ? await response.json() : await response.text();
-
-                        let mensajeError = 'Error en la respuesta';
-                        if (errorData && errorData.errors && Array.isArray(errorData.errors)) {
-                            mensajeError = errorData.errors.join('\n');
-                        } else if (typeof errorData === 'string') {
-                            mensajeError = errorData;
-                        }
-
-                        throw new Error(mensajeError);
-                    }
-
-                    return isJson ? await response.json() : null;
-                })
-                .then(result => {
-                    // Recargar DataTable (si seguís usando jQuery solo para eso)
+                try {
+                    const url = "/transacciones/crear";
+                    await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
                         $('#tablaTransacciones').DataTable().ajax.reload();
                     }
-
-                    // Cerrar el modal de Bootstrap
+                    // Cerrar modal
                     const modalElement = document.getElementById('modalCrear');
                     const modalInstance = bootstrap.Modal.getInstance(modalElement);
                     modalInstance.hide();
-
                     mostrarToast('Cambios guardados correctamente', 'success');
-                })
-                .catch(error => {
+                } catch (error) {
                     console.error('Error al guardar:', error);
                     mostrarToast(error.message, 'danger');
-
-                })
-                .finally(() => {
+                } finally {
                     btnGuardar.disabled = false;
-                });
+                }
+
             });
-        });
+        }
 
+        // Región: Evento Clic Actualizar CCL
+        function actualizarBotonCcl(){
+            const boton = document.getElementById('buton-ccl');
+            boton.addEventListener('click', async () => {
+                const fecha = document.getElementById('crearFecha').value;
+                if (fecha) {
+                    const fechaAnt = new Date(fecha);
+                    fechaAnt.setDate(fechaAnt.getDate() - 7);
+                    const fechaAux = fechaAnt.toISOString().split('T')[0]
+                    const valorccl = await cargarDolarHistorico(fechaAux, fecha);
+                    if(valorccl){
+                        console.log("Valor recuperado: ", valorccl.cclhistorico);
+                           if (!isNaN(valorccl.cclhistorico)) {
+                               document.getElementById("crearValorCCL").value = valorccl.cclhistorico;
+                           }
+                    }
+                }
 
+            });
+        }
 
     </script>
 }

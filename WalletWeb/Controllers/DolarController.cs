@@ -28,5 +28,19 @@ namespace UI.WalletWeb.Controllers
                 ccl = valor
             });
         }
+
+        [HttpGet("cclhistorico/json")]
+        public async Task<IActionResult> ObtenerHistorico(DateTime fechaInicio, DateTime fechaFinal)
+        {
+            var rta = await _ambitoApi.ObtenerHistoricoCCL(fechaInicio, fechaFinal);
+            if (!rta.Success) { return BadRequest(rta.Message); }
+
+            var valor = rta.Data;
+
+            return Json(new
+            {
+                cclhistorico = valor
+            });
+        }
     }
 }

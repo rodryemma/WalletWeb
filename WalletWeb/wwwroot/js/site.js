@@ -3,6 +3,42 @@
 
 // Write your JavaScript code.
 
+async function apiRequest(url, method = "GET", data = null) {
+    try {
+        const options = {
+            method,
+            headers: { "Content-Type": "application/json" }
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
+
+        const contentType = response.headers.get("content-type");
+        const isJson = contentType && contentType.includes("application/json");
+
+        if (!response.ok) {
+            const errorData = isJson ? await response.json() : await response.text();
+            let mensajeError = 'Error en la respuesta';
+
+            if (errorData?.errors && Array.isArray(errorData.errors)) {
+                mensajeError = errorData.errors.join('\n');
+            } else if (typeof errorData === 'string') {
+                mensajeError = errorData;
+            }
+            throw new Error(mensajeError);
+        }
+
+        return isJson ? await response.json() : null;
+
+    } catch (error) {
+        console.error("Error en apiRequest:", error);
+        throw error; 
+    }
+}
+
 function mostrarToast(mensaje, tipo = 'success') {
     const toastEl = document.getElementById('toastMensaje');
     const toastTexto = document.getElementById('toastMensajeTexto');

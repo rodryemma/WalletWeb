@@ -9,7 +9,7 @@ namespace Domain.Model.Interfaces
 {
     public interface IAmbitoApi
     {
-        Task<OperationResult<string>> ObtenerHistoricoCCL(DateTime fechaInicio, DateTime fechaFinal);
+        Task<OperationResult<decimal>> ObtenerHistoricoCCL(DateTime fechaInicio, DateTime fechaFinal);
         Task<OperationResult<string>> obtenerCCLAmbito();
         Task ActualizarCotizacionAsync();
     }
