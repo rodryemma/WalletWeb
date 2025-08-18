@@ -3,36 +3,66 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Transacciones</h2>
+<h2 class="mb-4 pb-2 fw-semibold text-secondary">Transacciones</h2>
 
-<div>
-    <label>Dolar CCL: <span id="valorDolar">0.00</span></label>
+<div class="d-flex gap-3 mb-4">
+
+    <div class="p-3 bg-light border rounded shadow-sm flex-fill text-center">
+        <div class="text-muted small">Total en USD</div>
+        <div class="h5 fw-bold" id="totalMonto">0.00</div>
+    </div>
+
+    <div class="p-3 bg-light border rounded shadow-sm flex-fill text-center">
+        <div class="text-muted small">Dólar CCL</div>
+        <div class="h5 fw-bold" id="valorDolar">0.00</div>
+    </div>
+
 </div>
 
-<p>Total en USD: <span id="totalMonto">0.00</span></p>
+<div class="p-3 bg-white border rounded shadow-sm mb-4">
+    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
 
-<div>
-    <label for="tipoMovimientoSelect" class="form-label me-2">Filtrar por movimiento:</label>
-    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
-        <option value="total">Total</option>
-        <option value="gastos">Gastos</option>
-        <option value="ingresos">Ingresos</option>
-    </select>
+    <div class="row g-3">
+
+        <div class="col-sm-6">
+            <div class="p-3 bg-light border rounded shadow-sm h-100">
+                <div class="text-muted small mb-2">Por movimiento</div>
+                <div class="mt-auto">
+                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
+                        <option value="total">Total</option>
+                        <option value="gastos">Gastos</option>
+                        <option value="ingresos">Ingresos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="p-3 bg-light border rounded shadow-sm h-100">
+                <div class="text-muted small mb-2">Por fecha</div>
+                <div class="mt-auto">
+                    <label class="small fw-bold">Desde:</label>
+                    <input type="date" id="fechaDesde">
+                    <label class="small fw-bold">Hasta:</label>
+                    <input type="date" id="fechaHasta">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
 
-<div>
-    <label>Fecha desde:</label>
-    <input type="date" id="fechaDesde">
-    <label>Fecha hasta:</label>
-    <input type="date" id="fechaHasta">
+<div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+    <h4 class="fw-semibold text-secondary">Lista de Transacciones</h4>
+    <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
+        <i class="bi bi-plus"></i> Agregar
+    </button>
 </div>
 
-<div>
-    <button class="btn-crear btn btn-sm btn-primary" id="btn-crear">Crear</button>
-</div>
 
 <div>
-    <table id="tablaTransacciones" class="display">
+    <table id="tablaTransacciones" class="table table-striped display">
         <thead>
             <tr>
                 <th>Fecha</th>
@@ -50,73 +80,83 @@
 
 <!-- Modal de Eliminación -->
 <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="tituloModal">Confirmar eliminación</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-danger">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloModal">Confirmar eliminación</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body">
-                ¿Estás seguro de que querés eliminar este registro?
+
+            <div class="modal-body text-center py-4">
+                <p class="mb-0 fs-6 text-muted">
+                    ¿Estás seguro de que querés eliminar este registro?
+                </p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Eliminar</button>
+
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger px-4" id="btnConfirmarEliminar">Eliminar</button>
             </div>
+
         </div>
     </div>
 </div>
 
 <!-- Modal de modificación -->
 <div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="tituloEditar" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="tituloEditar">Editar transacción</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-primary">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloEditar">
+                    Editar transacción
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body p-3">
+
+            <div class="modal-body p-4">
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
 
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="editarFecha" class="form-label">Fecha</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="editarFecha" class="form-label small text-muted">Fecha</label>
                             <input type="date" class="form-control" id="editarFecha" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarCategoria" class="form-label">Categoría</label>
+                        <div class="col-md-6">
+                            <label for="editarCategoria" class="form-label small text-muted">Categoría</label>
                             <input type="text" class="form-control" id="editarCategoria" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarCuenta" class="form-label">Cuenta</label>
+                        <div class="col-md-6">
+                            <label for="editarCuenta" class="form-label small text-muted">Cuenta</label>
                             <input type="text" class="form-control" id="editarCuenta" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarCantidadDivisa" class="form-label">Cantidad Divisa</label>
+                        <div class="col-md-6">
+                            <label for="editarCantidadDivisa" class="form-label small text-muted">Cantidad Divisa</label>
                             <input type="number" step="any" class="form-control" id="editarCantidadDivisa" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarDivisa" class="form-label">Divisa</label>
+                        <div class="col-md-6">
+                            <label for="editarDivisa" class="form-label small text-muted">Divisa</label>
                             <input type="text" class="form-control" id="editarDivisa" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarComentario" class="form-label">Comentario</label>
+                        <div class="col-md-6">
+                            <label for="editarComentario" class="form-label small text-muted">Comentario</label>
                             <input type="text" class="form-control" id="editarComentario" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarValorCCL" class="form-label">Valor CCL</label>
+                        <div class="col-md-6">
+                            <label for="editarValorCCL" class="form-label small text-muted">Valor CCL</label>
                             <input type="number" step="any" class="form-control" id="editarValorCCL" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="editarTipoMovimiento" class="form-label">Tipo Movimiento</label>
+                        <div class="col-md-6">
+                            <label for="editarTipoMovimiento" class="form-label small text-muted">Tipo Movimiento</label>
                             <select class="form-control" id="editarTipoMovimiento">
                                 <option value="ingresos">Ingresos</option>
                                 <option value="gastos">Gastos</option>
@@ -126,9 +166,9 @@
                 </form>
 
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary" id="btnGuardarCambios">Guardar</button>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-primary px-4" id="btnGuardarCambios">Guardar</button>
             </div>
         </div>
     </div>
@@ -136,49 +176,54 @@
 
 <!-- Modal de creación -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="tituloCrear">Crear transacción</h5>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-primary">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloCrear">
+                    Crear transacción
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
-            <div class="modal-body p-3">
+            <div class="modal-body p-4">
                 <form id="formCrear">
-                    @* <input type="hidden" id="crearId" /> *@
 
-                    <div class="row">
-                        <div class="col-md-6 mb-2">
-                            <label for="crearFecha" class="form-label">Fecha</label>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="crearFecha" class="form-label small text-muted">Fecha</label>
                             <input type="date" class="form-control" id="crearFecha" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearCategoria" class="form-label">Categoría</label>
+                        <div class="col-md-6">
+                            <label for="crearCategoria" class="form-label small text-muted">Categoría</label>
                             <input type="text" class="form-control" id="crearCategoria" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearCuenta" class="form-label">Cuenta</label>
+                        <div class="col-md-6">
+                            <label for="crearCuenta" class="form-label small text-muted">Cuenta</label>
                             <input type="text" class="form-control" id="crearCuenta" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearCantidadDivisa" class="form-label">Cantidad Divisa</label>
+                        <div class="col-md-6">
+                            <label for="crearCantidadDivisa" class="form-label small text-muted">Cantidad Divisa</label>
                             <input type="number" step="any" class="form-control" id="crearCantidadDivisa" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearDivisa" class="form-label">Divisa</label>
+                        <div class="col-md-6">
+                            <label for="crearDivisa" class="form-label small text-muted">Divisa</label>
                             <input type="text" class="form-control" id="crearDivisa" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearComentario" class="form-label">Comentario</label>
+                        <div class="col-md-6">
+                            <label for="crearComentario" class="form-label small text-muted">Comentario</label>
                             <input type="text" class="form-control" id="crearComentario" required />
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearValorCCL" class="form-label">Valor CCL</label>
+                        <div class="col-md-6">
+                            <label for="crearValorCCL" class="form-label small text-muted">
+                                Valor CCL
+                            </label>
+
                             <div class="input-group">
                                 <input type="number" step="any" class="form-control" id="crearValorCCL" required />
                                 <span class="input-group-text" id="buton-ccl" style="cursor: pointer;">
@@ -190,8 +235,10 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6 mb-2">
-                            <label for="crearTipoMovimiento" class="form-label">Tipo Movimiento</label>
+                        <div class="col-md-6">
+                            <label for="crearTipoMovimiento" class="form-label small text-muted">
+                                Tipo Movimiento
+                            </label>
                             <select class="form-control" id="crearTipoMovimiento">
                                 <option value="ingresos">Ingresos</option>
                                 <option value="gastos">Gastos</option>
@@ -201,9 +248,9 @@
                 </form>
 
             </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" class="btn btn-primary" id="btnGuardarNuevo">Guardar</button>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-primary px-4" id="btnGuardarNuevo">Guardar</button>
             </div>
         </div>
     </div>
@@ -281,8 +328,8 @@
 
             // Convertir a formato compatible (si es necesario)
             let fecha = new Date(fechaColumna.split('/').reverse().join('-'));
-            let desde = fechaDesde ? new Date(fechaDesde) : null;
-            let hasta = fechaHasta ? new Date(fechaHasta) : null;
+            let desde = fechaDesde ? new Date(fechaDesde + 'T00:00:00') : null;
+            let hasta = fechaHasta ? new Date(fechaHasta + 'T23:59:59') : null;
 
             return (!desde || fecha >= desde) && (!hasta || fecha <= hasta);
             });
@@ -290,8 +337,6 @@
             $('#fechaDesde, #fechaHasta').on('change', function () {
                 $('#tablaTransacciones').DataTable().draw();
             });
-
-            //const data = { tipoMovimiento: $('#tipoMovimientoSelect').val() };
 
             let tabla = $('#tablaTransacciones').DataTable({
                 responsive: true,
@@ -307,7 +352,7 @@
                          d.fecha = $('#fechaDesde').val();
                     }
                 },
-                order: [[0, 'desc']],//Fecha de forma descendente
+                order: [[0, 'desc']],//Fecha descendente
                 columns: [
                     {
                         data: 'fecha',
@@ -334,10 +379,11 @@
                       searchable: false,
                       render: function (data, type, row) {
                           return `
-                              <button class="btn-editar btn btn-sm btn-primary" data-id="${row.id}">Editar</button>
-                              <button class="btn-eliminar btn btn-sm btn-danger" data-id="${row.id}">
-                                      Eliminar
-                                      <i class="bi bi-trash-fill"></i>
+                              <button class="btn-editar btn btn-sm btn-outline-primary" data-id="${row.id}">
+                                       <i class="bi bi-pencil"></i>
+                              </button>
+                              <button class="btn-eliminar btn btn-sm btn-outline-danger" data-id="${row.id}">
+                                      <i class="bi bi-trash"></i>
                               </button>
                           `;
                       }
@@ -380,11 +426,13 @@
             });
         });
 
-        // Región: Botón Eliminar
-        let idAEliminar = null;        
+        // Región: Botón Eliminar Abrir Modal
+        let idAEliminar = null;
         document.querySelector('#tablaTransacciones').addEventListener('click', function (e) {
-            if (e.target.classList.contains('btn-eliminar')) {
-                idAEliminar = e.target.dataset.id;
+            const btnEliminar = e.target.closest('.btn-eliminar');
+            if (btnEliminar) {
+
+                idAEliminar = btnEliminar.dataset.id;
                 document.getElementById('modalConfirmarEliminar').dataset.id = idAEliminar;
 
                 const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
@@ -427,13 +475,16 @@
             const tabla = document.getElementById('tablaTransacciones');
 
             tabla.addEventListener('click', function (event) {
-                const target = event.target;
+                //const target = event.target;
+                const btnEditar = event.target.closest('.btn-editar');
 
-                if (target.classList.contains('btn-editar')) {
-                    const id = target.getAttribute('data-id');
+                //if (target.classList.contains('btn-editar')) {
+                if (btnEditar) {
+
+                    const id = btnEditar.dataset.id;
 
                     // Encontramos la fila asociada
-                    const tr = target.closest('tr');
+                    const tr = btnEditar.closest('tr');
 
                     // Usamos DataTables para obtener la data
                     const row = $('#tablaTransacciones').DataTable().row(tr).data();

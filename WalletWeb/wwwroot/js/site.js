@@ -48,6 +48,7 @@ function mostrarToast(mensaje, tipo = 'success') {
     // Reemplazar clases visuales
     //toastEl.className = `toast align-items-center text-bg-${tipo} bg-primary border-0`;
 
+    //toastEl.className = 'toast align-items-center text-white border-0 shadow rounded';
     toastEl.className = 'toast align-items-center text-white border-0 shadow rounded';
 
     // Agregar color de fondo según tipo (success, danger, warning, info)

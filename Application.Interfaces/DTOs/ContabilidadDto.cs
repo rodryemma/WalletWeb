@@ -11,25 +11,25 @@ namespace Application.DTOs
     {
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Fecha es obligatorio.")]
         public DateTime Fecha { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Categoria es obligatorio.")]
         public string Categoria { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
         public string Cuenta { get; set; }
 
         [Range(0.1, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double CantidadDivisa { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
         public string Divisa { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Comentario es obligatorio.")]
         public string Comentario { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Tipo Movimiento es obligatorio.")]
         public string TipoMovimiento { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
@@ -42,25 +42,25 @@ namespace Application.DTOs
         [Required]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Fecha es obligatorio.")]
         public DateTime Fecha { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Categoria es obligatorio.")]
         public string Categoria { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
         public string Cuenta { get; set; }
 
         [Range(0.1, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double CantidadDivisa { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
         public string Divisa { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Comentario es obligatorio.")]
         public string Comentario { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "El campo Tipo Movimiento es obligatorio.")]
         public string TipoMovimiento { get; set; }
 
         [Range(0.01, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
