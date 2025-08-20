@@ -25,6 +25,7 @@ namespace UI.WalletWeb.Controllers
             return View();
         }
 
+
         [HttpGet("transacciones/json")]
         public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
         {

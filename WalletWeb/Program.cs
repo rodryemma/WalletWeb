@@ -1,10 +1,11 @@
-using Application.Services;
 using Application.Interfaces;
+using Application.Services;
 using Domain.Model.Interfaces;
 using Infra.DataAccess.Data;
+using Infra.DataAccess.Repositories;
 using Infra.DataAccess.Repository;
-using Microsoft.AspNetCore.Connections;
 using Infra.ExternalServices.Api;
+using Microsoft.AspNetCore.Connections;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<Domain.Model.Interfaces.IConnectionFactory, ConnectionFactory>();
 builder.Services.AddScoped<IContabilidadRepository, ContabilidadRepository>();
 builder.Services.AddScoped<IContabilidadService, ContabilidadService>();
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
+builder.Services.AddScoped<ICategoriaService, CategoriaService>();
 builder.Services.AddSingleton<IDolarService, DolarService>();
 builder.Services.AddHttpClient<IDolarArgentinaApi, DolarArgentinaApi>();
 builder.Services.AddHttpClient<IAmbitoApi, AmbitoApi>();
