@@ -25,7 +25,6 @@ namespace UI.WalletWeb.Controllers
             return View();
         }
 
-
         [HttpGet("transacciones/json")]
         public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
         {
@@ -95,6 +94,7 @@ namespace UI.WalletWeb.Controllers
         [HttpPost("transacciones/crear")]
         public async Task<IActionResult> Insertar([FromBody] ContabilidadDto transaccion)
         {
+            //TODO : Validar que no exista el nombre
             if (transaccion == null)
             {
                 return BadRequest("La transacción enviada es nula.");
@@ -141,7 +141,6 @@ namespace UI.WalletWeb.Controllers
                 Ok() :
                 BadRequest(transaccion.Message);
         }
-
 
     }
 }

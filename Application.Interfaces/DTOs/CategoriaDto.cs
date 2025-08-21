@@ -22,7 +22,26 @@ namespace Application.DTOs
         public string Tipo { get; set; }
 
         [Required(ErrorMessage = "El campo Descripcion es obligatorio.")]
-        public double Descripcion { get; set; }
+        public string Descripcion { get; set; }
         
+    }
+
+    public class CategoriaUpdateDto
+    {
+        [Required]
+        public int Id { get; set; }
+
+        [Required(ErrorMessage = "El campo Fecha es obligatorio.")]
+        public DateTime Fecha { get; set; }
+
+        [Required(ErrorMessage = "El campo Nombre es obligatorio.")]
+        public string Nombre { get; set; }
+
+        [Required(ErrorMessage = "El campo Descripción es obligatorio.")]
+        public string Descripcion { get; set; }
+
+        [Required(ErrorMessage = "El campo Tipo es obligatorio.")]
+        public string Tipo { get; set; }
+
     }
 }
