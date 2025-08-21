@@ -1,0 +1,363 @@
+﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<h2 class="mb-4 pb-2 fw-semibold text-secondary">Divisa</h2>
+
+<div class="d-flex justify-content-between align-items-center mb-3 mt-5">
+    <h4 class="fw-semibold text-secondary">Lista de Divisa</h4>
+    <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
+        <i class="bi bi-plus"></i> Agregar
+    </button>
+</div>
+
+<div>
+    <table id="tablaDivisa" class="table table-striped display">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<!-- Modal de creación -->
+<div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-primary">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloCrear">
+                    Crear divisa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="formCrear">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label for="crearNombre" class="form-label small text-muted">Nombre</label>
+                            <input type="text" class="form-control" id="crearNombre" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="crearDescripcion" class="form-label small text-muted">Descripción</label>
+                            <input type="text" class="form-control" id="crearDescripcion" required />
+                        </div>
+                        
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-primary px-4" id="btnGuardarNuevo">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Eliminación -->
+<div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-danger">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloModal">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body text-center py-4">
+                <p class="mb-0 fs-6 text-muted">
+                    ¿Estás seguro de que querés eliminar este registro?
+                </p>
+            </div>
+
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-outline-danger px-4" id="btnConfirmarEliminar">Eliminar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- Modal de modificación -->
+<div class="modal fade" id="modalEditar" tabindex="-1" aria-labelledby="tituloEditar" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content border-0 shadow-sm rounded-3">
+
+            <div class="modal-header border-0 border-top border-3 border-primary">
+                <h5 class="modal-title fw-semibold text-secondary" id="tituloEditar">
+                    Editar divisa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+
+            <div class="modal-body p-4">
+                <form id="formEditar">
+                    <input type="hidden" id="editarId" />
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+                            <label for="editarNombre" class="form-label small text-muted">Nombre</label>
+                            <input type="text" class="form-control" id="editarNombre" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="editarDescripcion" class="form-label small text-muted">Descripción</label>
+                            <input type="text" class="form-control" id="editarDescripcion" required />
+                        </div>
+                       
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer border-0 d-flex justify-content-center gap-2">
+                <button class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-outline-primary px-4" id="btnGuardarCambios">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            cargarModalEditar();
+            cargarModalCrear();
+
+            await guardarDivisa();
+            await eliminarDivisa();
+            await editarDivisa();
+        });
+        // Región: Cargar DataTable
+        $(document).ready(function () {
+                let tabla = $('#tablaDivisa').DataTable({
+                responsive: true,
+                paging: true,
+                destroy: true,
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+                },
+                ajax: {
+                    url: '/divisa/json'
+                },
+                //order: [[0, 'desc']],//Fecha descendente
+                columns: [
+                        { data: 'nombre' },
+                        { data: 'descripcion' },                        
+                        {
+                          data: null,
+                          orderable: false,
+                          searchable: false,
+                          render: function (data, type, row) {
+                              return `
+                                <button class="btn-editar btn btn-sm btn-outline-primary" data-id="${row.id}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn-eliminar btn btn-sm btn-outline-danger" data-id="${row.id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                              `;
+                          }
+                        }
+                        ]
+            });
+            //Recargar table por tipomovimiento
+            $('#tipoMovimientoSelect').change(function () {
+            tabla.ajax.reload();
+            });
+
+        });
+
+        // Región: Botón Crear Abrir Modal
+        function cargarModalCrear(){
+            const btnCrear = document.getElementById('btn-crear');
+
+            btnCrear.addEventListener('click', function () {
+                document.getElementById('crearNombre').value = "";
+                document.getElementById('crearDescripcion').value = "";
+                const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
+                modalCrear.show();
+            });
+        }
+
+        // Región: Post Crear
+        async function guardarDivisa(){
+            const btnGuardar = document.getElementById('btnGuardarNuevo');
+            const form = document.getElementById("formCrear");
+
+            //Validar formulario "formCrear"
+            btnGuardar.addEventListener('click', async () => {
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                btnGuardar.disabled = true;
+
+                const data = {
+                    Nombre: document.getElementById('crearNombre').value,
+                    Descripcion: document.getElementById('crearDescripcion').value
+                };
+
+                try {
+                    const url = "/divisa/crear";
+                    await apiRequest(url, "POST", data);
+                    if (window.$ && $.fn.DataTable) {
+                        $('#tablaDivisa').DataTable().ajax.reload();
+                    }
+                    // Cerrar modal
+                    const modalElement = document.getElementById('modalCrear');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+                    mostrarToast('Cambios guardados correctamente', 'success');
+                } catch (error) {
+                    console.error('Error al guardar:', error);
+                    mostrarToast(error.message, 'danger');
+                } finally {
+                    btnGuardar.disabled = false;
+                }
+
+            });
+        }
+
+        // Región: Botón Eliminar Abrir Modal
+        let idAEliminar = null;
+        document.querySelector('#tablaDivisa').addEventListener('click', function (e) {
+            const btnEliminar = e.target.closest('.btn-eliminar');
+            if (btnEliminar) {
+
+                idAEliminar = btnEliminar.dataset.id;
+                document.getElementById('modalConfirmarEliminar').dataset.id = idAEliminar;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+                modal.show();
+            }
+        });
+
+        // Región: Post Eliminar
+        async function eliminarDivisa(){
+            const btnEliminar = document.getElementById('btnConfirmarEliminar');
+
+            btnEliminar.addEventListener('click', async () => {
+                if (typeof idAEliminar !== 'undefined' && idAEliminar !== null) {
+                    btnEliminar.disabled = true;
+                    const data = { id: idAEliminar };
+                    try {
+                        const url = "/divisa/eliminar";
+                        await apiRequest(url, "POST", data);
+                        if (window.$ && $.fn.DataTable) {
+                            $('#tablaDivisa').DataTable().ajax.reload();
+                        }
+                        idAEliminar = null;
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
+                        if (modal) modal.hide();
+
+                        mostrarToast('Registro eliminado correctamente', 'success');
+                    } catch(error) {
+                        console.error('Error al guardar:', error);
+                        mostrarToast(error.message, 'danger');
+                    } finally {
+                        btnEliminar.disabled = false;
+                    }
+                }
+            });
+        }
+
+        // Región: Botón Editar Abrir Modal
+        function cargarModalEditar(){
+            const tabla = document.getElementById('tablaDivisa');
+
+            tabla.addEventListener('click', function (event) {
+                //const target = event.target;
+                const btnEditar = event.target.closest('.btn-editar');
+
+                //if (target.classList.contains('btn-editar')) {
+                if (btnEditar) {
+
+                    const id = btnEditar.dataset.id;
+
+                    // Encontramos la fila asociada
+                    const tr = btnEditar.closest('tr');
+
+                    // Usamos DataTables para obtener la data
+                    const row = $('#tablaDivisa').DataTable().row(tr).data();
+
+                    if (!row) {
+                        console.error('No se encontró la fila en DataTable');
+                        return;
+                    }
+
+                    const fechaFormateada = row.fecha?.toString().split('T')[0];
+
+                    // Llenar los campos del modal
+                    document.getElementById('editarId').value = row.id;
+                    document.getElementById('editarNombre').value = row.nombre;
+                    document.getElementById('editarDescripcion').value = row.descripcion;
+
+                    // Mostrar el modal
+                    const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
+                    modalEditar.show();
+                }
+            });
+        }
+
+        // Región: Post Editar
+        async function editarDivisa(){
+            const btnGuardar = document.getElementById('btnGuardarCambios');
+            const form = document.getElementById("formEditar");
+
+            //Validar formulario "formEditar"
+            btnGuardar.addEventListener('click', async () => {
+
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
+                // Desactivar el botón para evitar múltiples envíos
+                btnGuardar.disabled = true;
+
+                const data = {
+                    Id: document.getElementById('editarId').value,
+                    Nombre: document.getElementById('editarNombre').value,
+                    Descripcion: document.getElementById('editarDescripcion').value
+                };
+
+                try  {
+                    const url = "/divisa/editar";
+                    await apiRequest(url, "POST", data);
+                    if (window.$ && $.fn.DataTable) {
+                        $('#tablaDivisa').DataTable().ajax.reload();
+                    }
+                    // Cerrar el modal de Bootstrap
+                    const modalElement = document.getElementById('modalEditar');
+                    const modalInstance = bootstrap.Modal.getInstance(modalElement);
+                    modalInstance.hide();
+
+                    mostrarToast('Cambios guardados correctamente', 'success');
+                } catch(error) {
+                    console.error('Error al guardar:', error);
+                    mostrarToast(error.message, 'danger');
+                } finally {
+                    btnGuardar.disabled = false;
+                }
+            });
+        }
+
+    </script>
+}
