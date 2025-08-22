@@ -37,5 +37,10 @@ namespace Application.Services
         {
             return _DivisaRepository.ObtenerDivisaDBFullAsync();
         }
+
+        public Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsyncService(List<int> xIds)
+        {
+            return _DivisaRepository.ObtenerMultiplesDivisasAsync(xIds);
+        }
     }
 }

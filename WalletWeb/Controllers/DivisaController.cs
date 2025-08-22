@@ -33,6 +33,7 @@ namespace UI.WalletWeb.Controllers
                 x.Nombre,
                 x.Descripcion
             }).ToList();
+
             return Json(new
             {
                 data = lista

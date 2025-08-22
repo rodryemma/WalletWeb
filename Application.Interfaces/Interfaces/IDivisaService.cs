@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Task<OperationResult<int>> EliminarDivisaAsyncService(int xId);
         Task<OperationResult<int>> InsertarDivisaAsyncService(Divisa xDivisa);
         Task<OperationResult<List<Divisa>>> ObtenerDivisaDBFullAsyncService();
+        Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsyncService(List<int> xIds);
     }
 }

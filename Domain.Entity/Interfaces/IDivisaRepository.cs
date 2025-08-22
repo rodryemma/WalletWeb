@@ -11,8 +11,10 @@ namespace Domain.Model.Interfaces
     public interface IDivisaRepository
     {
         Task<OperationResult<List<Divisa>>> ObtenerDivisaDBFullAsync();
+        Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsync(List<int> xIds);
         Task<OperationResult<int>> InsertarDivisaAsync(Divisa xDivisa);
         Task<OperationResult<int>> EditarDivisaAsync(Divisa xDivisa);
         Task<OperationResult<int>> EliminarDivisaAsync(int xId);
+        
     }
 }

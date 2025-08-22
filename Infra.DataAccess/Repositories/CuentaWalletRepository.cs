@@ -1,5 +1,6 @@
 ﻿using Domain.Model.Entites;
 using Domain.Model.Interfaces;
+using Infra.DataAccess.Data;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using Shared;
@@ -11,127 +12,85 @@ using System.Threading.Tasks;
 
 namespace Infra.DataAccess.Repositories
 {
-    public class DivisaRepository : IDivisaRepository
+    public class CuentaWalletRepository : ICuentaWalletRepository
     {
         private readonly IConnectionFactory _IConnectionFactory;
         private readonly string _connectionString;
 
-        public DivisaRepository(IConnectionFactory iConnectionFactory, IConfiguration configuration)
+        public CuentaWalletRepository(IConfiguration configuration, IConnectionFactory xIConnectionFactory)
         {
             _connectionString = configuration.GetConnectionString("DataBase_MySqlRasp");
-            _IConnectionFactory = iConnectionFactory;
+            _IConnectionFactory = xIConnectionFactory;
         }
 
-        public async Task<OperationResult<List<Divisa>>> ObtenerDivisaDBFullAsync()
+        public async Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsync()
         {
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
 
-                    var sqlString = "SELECT * FROM Divisa ORDER BY Nombre DESC";
+                    var sqlString = "SELECT * FROM CuentaWallet ORDER BY Nombre DESC";
                     
                     using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
                     {
+                        
                         using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
                         {
-                            List<Divisa> query = new List<Divisa>();
+                            List<CuentaWallet> query = new List<CuentaWallet>();
                             while (await reader.ReadAsync())
                             {
-                                query.Add(new Divisa()
+                                query.Add(new CuentaWallet()
                                 {
                                     Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
                                     Nombre = reader["Nombre"].ToString(),
-                                    Descripcion = reader["Descripcion"].ToString()
+                                    Descripcion = reader["Descripcion"].ToString(),
+                                    DivisaId = reader.GetInt32("DivisaId")
                                 });
 
                             }
-                            return OperationResult<List<Divisa>>.Ok(query);
+                            return OperationResult<List<CuentaWallet>>.Ok(query);
                         }
                     }
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
+                    return OperationResult<List<CuentaWallet>>.Fail("Error al eliminar: " + ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
+                    return OperationResult<List<CuentaWallet>>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
 
         }
 
-        public async Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsync(List<int> ids)
-        {
-            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
-            {
-                if (ids == null || !ids.Any())
-                {
-                    return OperationResult<List<Divisa>>.Ok(new List<Divisa>());
-                }
-
-                try
-                {
-
-                    var parametros = string.Join(",", ids.Select((id, index) => $"@id{index}"));
-                    var sqlString = $"SELECT * FROM Divisa WHERE Id IN ({parametros}) ORDER BY Nombre DESC";
-
-                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
-                    {
-                        for (int i = 0; i < ids.Count; i++)
-                        {
-                            Comando.Parameters.AddWithValue($"@id{i}", ids[i]);
-                        }
-
-                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
-                        {
-                            List<Divisa> query = new List<Divisa>();
-                            while (await reader.ReadAsync())
-                            {
-                                query.Add(new Divisa()
-                                {
-                                    Id = reader.GetInt32("Id"),
-                                    Nombre = reader["Nombre"].ToString(),
-                                    Descripcion = reader["Descripcion"].ToString()
-                                });
-
-                            }
-                            return OperationResult<List<Divisa>>.Ok(query);
-                        }
-                    }
-                }
-                catch (MySqlException ex)
-                {
-                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
-                }
-                catch (Exception ex)
-                {
-                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
-                }
-            }
-
-        }
-
-        public async Task<OperationResult<int>> InsertarDivisaAsync(Divisa xDivisa)
+        public async Task<OperationResult<int>> InsertarCuentaWalletAsync(CuentaWallet xCuentaWallet)
         {
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
-                    string sqlString = @"INSERT INTO Divisa (        
+                    string sqlString = @"INSERT INTO CuentaWallet (                                          
+                                          Fecha,
                                           Nombre,
-                                          Descripcion)
+                                          Descripcion,
+                                          DivisaId)
                                          VALUES (
+                                          @Fecha,
                                           @Nombre,
-                                          @Descripcion)";
+                                          @Descripcion,
+                                          @DivisaId)";
 
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
                     {
-                        comando.Parameters.AddWithValue("@Nombre", xDivisa.Nombre);
-                        comando.Parameters.AddWithValue("@Descripcion", xDivisa.Descripcion);
+                        comando.Parameters.AddWithValue("@Fecha", xCuentaWallet.Fecha.ToString("yyyy-MM-dd HH:mm:ss"));
+                        comando.Parameters.AddWithValue("@Nombre", xCuentaWallet.Nombre);
+                        comando.Parameters.AddWithValue("@Descripcion", xCuentaWallet.Descripcion);
+                        comando.Parameters.AddWithValue("@DivisaId", xCuentaWallet.DivisaId);
 
                         var filasRta = await comando.ExecuteNonQueryAsync();
 
@@ -143,29 +102,33 @@ namespace Infra.DataAccess.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<int>.Fail("Error al insertar: " + ex.Message);
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
         }
 
-        public async Task<OperationResult<int>> EditarDivisaAsync(Divisa xDivisa)
+        public async Task<OperationResult<int>> EditarCuentaWalletAsync(CuentaWallet xCuentaWallet)
         {
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
-                    string sqlString = @"UPDATE Divisa 
+                    string sqlString = @"UPDATE CuentaWallet 
                                  SET 
+                                     Fecha = @Fecha,
                                      Nombre = @Nombre,
-                                     Descripcion = @Descripcion
+                                     Descripcion = @Descripcion,
+                                     DivisaId = @DivisaId 
                                  WHERE Id = @Id";
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
                     {
-                        comando.Parameters.AddWithValue("@Nombre", xDivisa.Nombre);
-                        comando.Parameters.AddWithValue("@Descripcion", xDivisa.Descripcion);
-                        comando.Parameters.AddWithValue("@Id", xDivisa.Id);
+                        comando.Parameters.AddWithValue("@Fecha", xCuentaWallet.Fecha.ToString("yyyy-MM-dd HH:mm:ss"));
+                        comando.Parameters.AddWithValue("@Nombre", xCuentaWallet.Nombre);
+                        comando.Parameters.AddWithValue("@Descripcion", xCuentaWallet.Descripcion);
+                        comando.Parameters.AddWithValue("@Id", xCuentaWallet.Id);
+                        comando.Parameters.AddWithValue("@DivisaId", xCuentaWallet.DivisaId);
 
                         var filasRta = await comando.ExecuteNonQueryAsync();
 
@@ -177,19 +140,19 @@ namespace Infra.DataAccess.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<int>.Fail("Error al editar: " + ex.Message);
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
                 }
             }
         }
 
-        public async Task<OperationResult<int>> EliminarDivisaAsync(int xId)
+        public async Task<OperationResult<int>> EliminarCuentaWalletAsync(int xId)
         {
 
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
             {
                 try
                 {
-                    string sqlString = @"DELETE FROM Divisa
+                    string sqlString = @"DELETE FROM CuentaWallet
                                           WHERE Id = @Id";
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
@@ -212,6 +175,5 @@ namespace Infra.DataAccess.Repositories
             }
 
         }
-
     }
 }

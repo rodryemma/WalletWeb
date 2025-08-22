@@ -2,46 +2,23 @@
     ViewData["Title"] = "Index";
 }
 
-<h2 class="mb-4 pb-2 fw-semibold text-secondary">Categoria</h2>
-
-<div class="p-3 bg-white border rounded shadow-sm mb-4">
-    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
-
-    <div class="row g-3">
-
-        <div class="col-sm-12">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por movimiento</div>
-                <div class="mt-auto">
-                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
-                        <option value="total">Total</option>
-                        <option value="gastos">Gastos</option>
-                        <option value="ingresos">Ingresos</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+<h2 class="mb-4 pb-2 fw-semibold text-secondary">Cuenta</h2>
 
 <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-    <h4 class="fw-semibold text-secondary">Lista de Categoria</h4>
+    <h4 class="fw-semibold text-secondary">Lista de Cuentas</h4>
     <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
         <i class="bi bi-plus"></i> Agregar
     </button>
 </div>
 
 <div>
-    <table id="tablaCategoria" class="table table-striped display">
+    <table id="tablaCuenta" class="table table-striped display">
         <thead>
             <tr>
-                <th>Categoría</th>
+                <th>Fecha</th>
+                <th>Nombre</th>
                 <th>Descripción</th>
-                <th>Fecha</th>               
-                <th>Tipo</th>
-                
+                <th>Divisa</th>
             </tr>
         </thead>
     </table>
@@ -55,7 +32,7 @@
 
             <div class="modal-header border-0 border-top border-3 border-primary">
                 <h5 class="modal-title fw-semibold text-secondary" id="tituloCrear">
-                    Crear categoría
+                    Crear cuenta
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -76,17 +53,17 @@
                         <div class="col-md-6">
                             <label for="crearDescripcion" class="form-label small text-muted">Descripción</label>
                             <input type="text" class="form-control" id="crearDescripcion" required />
-                        </div>                                               
+                        </div>
 
                         <div class="col-md-6">
-                            <label for="crearTipo" class="form-label small text-muted">
-                                Tipo
+                            <label for="crearDivisa" class="form-label small text-muted">
+                                Divisa
                             </label>
-                            <select class="form-control" id="crearTipo">
-                                <option value="ingresos">Ingresos</option>
-                                <option value="gastos">Gastos</option>
+                            <select id="divisaSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
                             </select>
                         </div>
+
                     </div>
                 </form>
 
@@ -131,7 +108,7 @@
 
             <div class="modal-header border-0 border-top border-3 border-primary">
                 <h5 class="modal-title fw-semibold text-secondary" id="tituloEditar">
-                    Editar categoría
+                    Editar Cuenta
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -157,12 +134,14 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="editarTipo" class="form-label small text-muted">Tipo</label>
-                            <select class="form-control" id="editarTipo">
-                                <option value="ingresos">Ingresos</option>
-                                <option value="gastos">Gastos</option>
+                            <label for="editarDivisa" class="form-label small text-muted">
+                                Divisa
+                            </label>
+                            <select id="divisaSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
                             </select>
                         </div>
+
                     </div>
                 </form>
 
@@ -175,26 +154,33 @@
     </div>
 </div>
 
-
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 }
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+
         document.addEventListener("DOMContentLoaded", async () => {
             cargarModalEditar();
             cargarModalCrear();
 
-            await guardarCategoria();
-            await eliminarCategoria();
-            await editarCategoria();
+            await guardarCuenta();
+            await eliminarCuenta();
+            await editarCuenta();
         });
+
+        $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
+            cargarSelect2Divisa();
+        });
+
         // Región: Cargar DataTable
         $(document).ready(function () {
-                let tabla = $('#tablaCategoria').DataTable({
+                let tabla = $('#tablaCuenta').DataTable({
                 responsive: true,
                 paging: true,
                 destroy: true,
@@ -202,12 +188,9 @@
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },
                 ajax: {
-                    url: '/categoria/json',
-                    data: function (d) {
-                         d.tipoMovimiento = $('#tipoMovimientoSelect').val();
-                    }
+                    url: '/cuentawallet/json'
                 },
-                //order: [[0, 'desc']],//Fecha descendente
+                order: [[1, 'asc']],//Nombre descendente
                 columns: [
                         {
                           data: 'fecha',
@@ -221,8 +204,7 @@
                         },
                         { data: 'nombre' },
                         { data: 'descripcion' },
-                                                
-                        { data: 'tipo' },                        
+                        { data: 'divisaId' },
                         {
                           data: null,
                           orderable: false,
@@ -240,11 +222,8 @@
                         }
                         ]
             });
-            //Recargar table por tipomovimiento
-            $('#tipoMovimientoSelect').change(function () {
-            tabla.ajax.reload();
-            });
-           
+            
+
         });
 
         // Región: Botón Crear Abrir Modal
@@ -257,14 +236,13 @@
                 document.getElementById('crearFecha').value = fechaHoy;
                 document.getElementById('crearNombre').value = "";
                 document.getElementById('crearDescripcion').value = "";
-                document.getElementById('crearTipo').value = "";
                 const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
                 modalCrear.show();
             });
         }
 
         // Región: Post Crear
-        async function guardarCategoria(){
+        async function guardarCuenta(){
             const btnGuardar = document.getElementById('btnGuardarNuevo');
             const form = document.getElementById("formCrear");
 
@@ -282,14 +260,14 @@
                     Fecha: document.getElementById('crearFecha').value,
                     Nombre: document.getElementById('crearNombre').value,
                     Descripcion: document.getElementById('crearDescripcion').value,
-                    Tipo: document.getElementById('crearTipo').value
+                    DivisaId: document.getElementById('divisaSelect').value
                 };
 
                 try {
-                    const url = "/categoria/crear";
+                    const url = "/cuentawallet/crear";
                     await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
-                        $('#tablaCategoria').DataTable().ajax.reload();
+                        $('#tablaCuenta').DataTable().ajax.reload();
                     }
                     // Cerrar modal
                     const modalElement = document.getElementById('modalCrear');
@@ -308,7 +286,7 @@
 
         // Región: Botón Eliminar Abrir Modal
         let idAEliminar = null;
-        document.querySelector('#tablaCategoria').addEventListener('click', function (e) {
+        document.querySelector('#tablaCuenta').addEventListener('click', function (e) {
             const btnEliminar = e.target.closest('.btn-eliminar');
             if (btnEliminar) {
 
@@ -321,7 +299,7 @@
         });
 
         // Región: Post Eliminar
-        async function eliminarCategoria(){
+        async function eliminarCuenta(){
             const btnEliminar = document.getElementById('btnConfirmarEliminar');
 
             btnEliminar.addEventListener('click', async () => {
@@ -329,10 +307,10 @@
                     btnEliminar.disabled = true;
                     const data = { id: idAEliminar };
                     try {
-                        const url = "/categoria/eliminar";
+                        const url = "/cuentawallet/eliminar";
                         await apiRequest(url, "POST", data);
                         if (window.$ && $.fn.DataTable) {
-                            $('#tablaCategoria').DataTable().ajax.reload();
+                            $('#tablaCuenta').DataTable().ajax.reload();
                         }
                         idAEliminar = null;
 
@@ -352,7 +330,7 @@
 
         // Región: Botón Editar Abrir Modal
         function cargarModalEditar(){
-            const tabla = document.getElementById('tablaCategoria');
+            const tabla = document.getElementById('tablaCuenta');
 
             tabla.addEventListener('click', function (event) {
                 //const target = event.target;
@@ -367,7 +345,7 @@
                     const tr = btnEditar.closest('tr');
 
                     // Usamos DataTables para obtener la data
-                    const row = $('#tablaCategoria').DataTable().row(tr).data();
+                    const row = $('#tablaCuenta').DataTable().row(tr).data();
 
                     if (!row) {
                         console.error('No se encontró la fila en DataTable');
@@ -381,7 +359,7 @@
                     document.getElementById('editarFecha').value = fechaFormateada;
                     document.getElementById('editarNombre').value = row.nombre;
                     document.getElementById('editarDescripcion').value = row.descripcion;
-                    document.getElementById('editarTipo').value = row.tipo;
+                    //document.getElementById('divisaSelect').value = row.divisaId;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -391,7 +369,7 @@
         }
 
         // Región: Post Editar
-        async function editarCategoria(){
+        async function editarCuenta(){
             const btnGuardar = document.getElementById('btnGuardarCambios');
             const form = document.getElementById("formEditar");
 
@@ -411,14 +389,14 @@
                     Fecha: document.getElementById('editarFecha').value,
                     Nombre: document.getElementById('editarNombre').value,
                     Descripcion: document.getElementById('editarDescripcion').value,
-                    Tipo: document.getElementById('editarTipo').value
+                    DivisaId: document.getElementById('editarDivisa').value
                 };
 
                 try  {
-                    const url = "/categoria/editar";
+                    const url = "/cuentawallet/editar";
                     await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
-                        $('#tablaCategoria').DataTable().ajax.reload();
+                        $('#tablaCuenta').DataTable().ajax.reload();
                     }
                     // Cerrar el modal de Bootstrap
                     const modalElement = document.getElementById('modalEditar');
@@ -435,6 +413,35 @@
             });
         }
 
+        // Región: Cargar Select Divisa
+        function cargarSelect2Divisa(){
+            var modalActivo = $('.modal.show').attr('id');
+            $('#divisaSelectCrear , #divisaSelectEditar').select2({
+                placeholder: 'Seleccionar...',
+                dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+                ajax: {
+                    url: '/divisa/json',
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            term: params.term || ''
+                        };
+                    },
+                    processResults: function (data) {
+                        return {
+                            results: data.data.map(function(item) {
+                                return {
+                                    id: item.id,
+                                    text: item.nombre
+                                };
+                            })
+                        };
+                    },
+                    cache: true
+                },
+            minimumInputLength: 0
+            });
+        }
     </script>
 }
-
