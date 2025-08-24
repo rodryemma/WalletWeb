@@ -116,6 +116,7 @@
             <div class="modal-body p-4">
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
+                    <input type="hidden" id="editarSelectDivisa" />
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -163,6 +164,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
 
         document.addEventListener("DOMContentLoaded", async () => {
@@ -260,7 +262,7 @@
                     Fecha: document.getElementById('crearFecha').value,
                     Nombre: document.getElementById('crearNombre').value,
                     Descripcion: document.getElementById('crearDescripcion').value,
-                    DivisaId: document.getElementById('divisaSelect').value
+                    DivisaId: document.getElementById('divisaSelectCrear').value
                 };
 
                 try {
@@ -359,7 +361,7 @@
                     document.getElementById('editarFecha').value = fechaFormateada;
                     document.getElementById('editarNombre').value = row.nombre;
                     document.getElementById('editarDescripcion').value = row.descripcion;
-                    //document.getElementById('divisaSelect').value = row.divisaId;
+                    document.getElementById('editarSelectDivisa').value = row.divisaId;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -389,7 +391,7 @@
                     Fecha: document.getElementById('editarFecha').value,
                     Nombre: document.getElementById('editarNombre').value,
                     Descripcion: document.getElementById('editarDescripcion').value,
-                    DivisaId: document.getElementById('editarDivisa').value
+                    DivisaId: document.getElementById('divisaSelectEditar').value
                 };
 
                 try  {
@@ -412,36 +414,7 @@
                 }
             });
         }
+              
 
-        // Región: Cargar Select Divisa
-        function cargarSelect2Divisa(){
-            var modalActivo = $('.modal.show').attr('id');
-            $('#divisaSelectCrear , #divisaSelectEditar').select2({
-                placeholder: 'Seleccionar...',
-                dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
-                ajax: {
-                    url: '/divisa/json',
-                    dataType: 'json',
-                    delay: 250,
-                    data: function (params) {
-                        return {
-                            term: params.term || ''
-                        };
-                    },
-                    processResults: function (data) {
-                        return {
-                            results: data.data.map(function(item) {
-                                return {
-                                    id: item.id,
-                                    text: item.nombre
-                                };
-                            })
-                        };
-                    },
-                    cache: true
-                },
-            minimumInputLength: 0
-            });
-        }
     </script>
 }

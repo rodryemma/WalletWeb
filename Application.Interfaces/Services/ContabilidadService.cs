@@ -43,7 +43,9 @@ namespace Application.Services
                 Comentario = m.Comentario,
                 TipoMovimiento = m.TipoMovimiento,
                 ValorCCL = m.ValorCCL,
-                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2)
+                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2),
+                DivisaId = m.DivisaId,
+                CuentaWalletId = m.CuentaWalletId
 
             }).ToList();
             return OperationResult<List<ContabilidadDto>>.Ok(movimiento);
@@ -65,7 +67,9 @@ namespace Application.Services
                 Comentario = m.Comentario,
                 TipoMovimiento = m.TipoMovimiento,
                 ValorCCL = m.ValorCCL,
-                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2)
+                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2),
+                DivisaId = m.DivisaId,
+                CuentaWalletId = m.CuentaWalletId
 
             }).ToList();
             return OperationResult<List<ContabilidadDto>>.Ok(movimiento);

@@ -17,5 +17,7 @@ namespace Domain.Model.Entity
         public string Comentario { get; set; }
         public string TipoMovimiento { get; set; }
         public double ValorCCL { get; set; }
+        public int DivisaId { get; set; }
+        public int CuentaWalletId { get; set; }
     }
 }

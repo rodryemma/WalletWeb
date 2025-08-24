@@ -78,3 +78,106 @@ function mostrarToast(mensaje, tipo = 'success') {
     toast.show();
 }
 
+function buscarSeleccionarSelect2PorTexto(url, idselect, texto) {
+    //Buscamos directamente por ajax la informacion y al obtenerla la cargamos nosotros y seleccionamos.
+    $.ajax({
+        url: url,
+        dataType: 'json',
+        data: { term: texto },
+        success: function (data) {
+            if (data.data && data.data.length > 0) {
+                // Buscar item exacto
+                const item = data.data.find(function (divisa) {
+                    return divisa.nombre.trim().toLowerCase() === texto.trim().toLowerCase();
+                });
+
+                if (item) {
+                    const $select = $(idselect);
+                    // Crear la opción y la seleccionamos
+                    const nuevaOpcion = new Option(item.nombre, item.id, true, true);
+                    $select.append(nuevaOpcion);
+                    $select.trigger('change');
+                }
+            }
+        }
+    });
+}
+
+// Región: Cargar Select Divisa
+function cargarSelect2Divisa() {
+    const url = '/divisa/json';
+    var modalActivo = $('.modal.show').attr('id');
+    $('#divisaSelectCrear , #divisaSelectEditar').select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+    if (modalActivo === 'modalEditar') {
+        const idSelect = '#divisaSelectEditar';
+        const text = document.getElementById('editarSelectDivisa').value;
+        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
+        document.getElementById('editarSelectDivisa').value = '';
+    }
+}
+
+// Región: Cargar Select Cuenta
+function cargarSelect2Cuenta() {
+    const url = '/cuentawallet/json';
+    var modalActivo = $('.modal.show').attr('id');
+    $('#cuentaSelectCrear , #cuentaSelectEditar').select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+    if (modalActivo === 'modalEditar') {
+        const idSelect = '#cuentaSelectEditar';
+        const text = document.getElementById('editarSelectCuenta').value;
+        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
+        document.getElementById('editarSelectCuenta').value = '';
+    }
+}
+

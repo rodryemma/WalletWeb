@@ -38,5 +38,24 @@ namespace Application.Services
         {
             return _cuentaWalletRepository.ObtenerCuentaWalletDBFullAsync();
         }
+
+        public Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<int> ids)
+        {
+            return _cuentaWalletRepository.ObtenerMultiplesCuentasAsync(ids);
+        }
+
+        public async Task<Dictionary<int, string>> ObtenerCuentasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector)
+        {
+            var divisaIds = entidades.Select(divisaIdSelector).Distinct().ToList();
+
+            if (!divisaIds.Any())
+                return new Dictionary<int, string>();
+
+            var divisasResult = await ObtenerMultiplesCuentasAsyncService(divisaIds);
+
+            return divisasResult?.Success == true && divisasResult.Data != null
+                ? divisasResult.Data.ToDictionary(d => d.Id, d => d.Nombre)
+                : new Dictionary<int, string>();
+        }
     }
 }

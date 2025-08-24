@@ -17,13 +17,13 @@ namespace Application.DTOs
         [Required(ErrorMessage = "El campo Categoria es obligatorio.")]
         public string Categoria { get; set; }
 
-        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
+        //[Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
         public string Cuenta { get; set; }
 
         [Range(0.1, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double CantidadDivisa { get; set; }
 
-        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
+        //[Required(ErrorMessage = "El campo Divisa es obligatorio.")]
         public string Divisa { get; set; }
 
         [Required(ErrorMessage = "El campo Comentario es obligatorio.")]
@@ -35,6 +35,12 @@ namespace Application.DTOs
         [Range(0.01, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double ValorCCL { get; set; }
         public double MontoUsd { get; set; }
+
+        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
+        public int DivisaId { get; set; }
+
+        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
+        public int CuentaWalletId { get; set; }
     }
 
     public class ContabilidadUpdateDto
@@ -48,13 +54,13 @@ namespace Application.DTOs
         [Required(ErrorMessage = "El campo Categoria es obligatorio.")]
         public string Categoria { get; set; }
 
-        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
+        //[Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
         public string Cuenta { get; set; }
 
         [Range(0.1, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double CantidadDivisa { get; set; }
 
-        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
+        //[Required(ErrorMessage = "El campo Divisa es obligatorio.")]
         public string Divisa { get; set; }
 
         [Required(ErrorMessage = "El campo Comentario es obligatorio.")]
@@ -66,5 +72,11 @@ namespace Application.DTOs
         [Range(0.01, double.MaxValue, ErrorMessage = "La cantidad debe ser mayor a 0.")]
         public double ValorCCL { get; set; }
         public double MontoUsd { get; set; }
+
+        [Required(ErrorMessage = "El campo Divisa es obligatorio.")]
+        public int DivisaId { get; set; }
+
+        [Required(ErrorMessage = "El campo Cuenta es obligatorio.")]
+        public int CuentaWalletId { get; set; }
     }
 }

@@ -42,5 +42,19 @@ namespace Application.Services
         {
             return _DivisaRepository.ObtenerMultiplesDivisasAsync(xIds);
         }
+
+        public async Task<Dictionary<int, string>> ObtenerDivisasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector)
+        {
+            var divisaIds = entidades.Select(divisaIdSelector).Distinct().ToList();
+
+            if (!divisaIds.Any())
+                return new Dictionary<int, string>();
+
+            var divisasResult = await ObtenerMultiplesDivisasAsyncService(divisaIds);
+
+            return divisasResult?.Success == true && divisasResult.Data != null
+                ? divisasResult.Data.ToDictionary(d => d.Id, d => d.Nombre)
+                : new Dictionary<int, string>();
+        }
     }
 }

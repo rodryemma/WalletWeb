@@ -37,9 +37,9 @@
     <table id="tablaCategoria" class="table table-striped display">
         <thead>
             <tr>
+                <th>Fecha</th>
                 <th>Categoría</th>
-                <th>Descripción</th>
-                <th>Fecha</th>               
+                <th>Descripción</th>             
                 <th>Tipo</th>
                 
             </tr>
@@ -207,7 +207,7 @@
                          d.tipoMovimiento = $('#tipoMovimientoSelect').val();
                     }
                 },
-                //order: [[0, 'desc']],//Fecha descendente
+                order: [[1, 'asc']],//Categoria ascendente
                 columns: [
                         {
                           data: 'fecha',

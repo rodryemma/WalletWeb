@@ -31,19 +31,15 @@ namespace UI.WalletWeb.Controllers
             var cuentas = await _cuentaWalletService.ObtenerCuentaWalletDBFullAsyncService();
             if (!cuentas.Success) { return BadRequest(cuentas.Message); }
 
-            //Buscar Id Divisa y volcarlos en un diccionario
-            var divisaIds = cuentas.Data.Select(x => x.DivisaId).Distinct().ToList();
-            var divisasResult = await _divisaService.ObtenerMultiplesDivisasAsyncService(divisaIds);
-            var divisasDict = divisasResult?.Success == true && divisasResult.Data != null
-                ? divisasResult.Data.ToDictionary(d => d.Id, d => d.Nombre)
-                : new Dictionary<int, string>();
-
+            var divisasDict = await _divisaService.ObtenerDivisasDictionarioAsync(cuentas.Data, x => x.DivisaId);
+            
             var lista = cuentas.Data.Select(x => new
             {
                 x.Id,
                 Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
                 x.Nombre,
                 x.Descripcion,
+                //Usamos el diccionario creado para dar el id a la divisa
                 DivisaId = divisasDict.TryGetValue(x.DivisaId, out string nombre) ? nombre : "Sin divisa"
             }).ToList();
 
@@ -134,5 +130,6 @@ namespace UI.WalletWeb.Controllers
                 Ok() :
                 BadRequest(transaccion.Message);
         }
+        
     }
 }

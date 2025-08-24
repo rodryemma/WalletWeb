@@ -118,6 +118,8 @@
             <div class="modal-body p-4">
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
+                    <input type="hidden" id="editarSelectDivisa" />
+                    <input type="hidden" id="editarSelectCuenta" />
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -130,9 +132,18 @@
                             <input type="text" class="form-control" id="editarCategoria" required />
                         </div>
 
-                        <div class="col-md-6">
+                        @* <div class="col-md-6">
                             <label for="editarCuenta" class="form-label small text-muted">Cuenta</label>
                             <input type="text" class="form-control" id="editarCuenta" required />
+                        </div> *@
+
+                        <div class="col-md-6">
+                            <label for="editarCuenta" class="form-label small text-muted">
+                                Divisa
+                            </label>
+                            <select id="cuentaSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
@@ -140,9 +151,18 @@
                             <input type="number" step="any" class="form-control" id="editarCantidadDivisa" required />
                         </div>
 
-                        <div class="col-md-6">
+                        @* <div class="col-md-6">
                             <label for="editarDivisa" class="form-label small text-muted">Divisa</label>
                             <input type="text" class="form-control" id="editarDivisa" required />
+                        </div> *@
+
+                        <div class="col-md-6">
+                            <label for="editarDivisa" class="form-label small text-muted">
+                                Divisa
+                            </label>
+                            <select id="divisaSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
@@ -199,9 +219,18 @@
                             <input type="text" class="form-control" id="crearCategoria" required />
                         </div>
 
-                        <div class="col-md-6">
+                        @* <div class="col-md-6">
                             <label for="crearCuenta" class="form-label small text-muted">Cuenta</label>
                             <input type="text" class="form-control" id="crearCuenta" required />
+                        </div> *@
+
+                        <div class="col-md-6">
+                            <label for="crearCuenta" class="form-label small text-muted">
+                                Cuenta
+                            </label>
+                            <select id="cuentaSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
 
                         <div class="col-md-6">
@@ -209,10 +238,20 @@
                             <input type="number" step="any" class="form-control" id="crearCantidadDivisa" required />
                         </div>
 
+                        @* Nuevo Divisa select *@
                         <div class="col-md-6">
+                            <label for="crearDivisa" class="form-label small text-muted">
+                                Divisa
+                            </label>
+                            <select id="divisaSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        @* <div class="col-md-6">
                             <label for="crearDivisa" class="form-label small text-muted">Divisa</label>
                             <input type="text" class="form-control" id="crearDivisa" required />
-                        </div>
+                        </div> *@
 
                         <div class="col-md-6">
                             <label for="crearComentario" class="form-label small text-muted">Comentario</label>
@@ -258,11 +297,13 @@
 
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 }
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <script>
 
@@ -276,6 +317,11 @@
             await eliminarTransaccion();
             await editarTransaccion();
             await guardarTransaccion();
+        });
+
+        $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
+            cargarSelect2Divisa();
+            cargarSelect2Cuenta();
         });
 
         // Región: Cargar DolarCCL
@@ -500,12 +546,12 @@
                     document.getElementById('editarId').value = row.id;
                     document.getElementById('editarFecha').value = fechaFormateada;
                     document.getElementById('editarCategoria').value = row.categoria;
-                    document.getElementById('editarCuenta').value = row.cuenta;
                     document.getElementById('editarCantidadDivisa').value = row.cantidadDivisa;
-                    document.getElementById('editarDivisa').value = row.divisa;
                     document.getElementById('editarComentario').value = row.comentario;
                     document.getElementById('editarTipoMovimiento').value = row.tipoMovimiento;
                     document.getElementById('editarValorCCL').value = row.valorCCL;
+                    document.getElementById('editarSelectCuenta').value = row.cuentaWalletId;
+                    document.getElementById('editarSelectDivisa').value = row.divisaId;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -534,12 +580,16 @@
                     Id: document.getElementById('editarId').value,
                     Fecha: document.getElementById('editarFecha').value,
                     Categoria: document.getElementById('editarCategoria').value,
-                    Cuenta: document.getElementById('editarCuenta').value,
+                    // Cuenta: document.getElementById('editarCuenta').value,
+                    Cuenta: '',
                     CantidadDivisa: document.getElementById('editarCantidadDivisa').value,
-                    Divisa: document.getElementById('editarDivisa').value,
+                    // Divisa: document.getElementById('editarDivisa').value,
+                    Divisa: '',
                     Comentario: document.getElementById('editarComentario').value,
                     TipoMovimiento: document.getElementById('editarTipoMovimiento').value,
                     ValorCCL: document.getElementById('editarValorCCL').value,
+                    CuentaWalletId: document.getElementById('cuentaSelectEditar').value,
+                    DivisaId: document.getElementById('divisaSelectEditar').value
                 };
 
                 try  {
@@ -572,9 +622,9 @@
                 const fechaHoy = hoy.toISOString().split('T')[0];
                 document.getElementById('crearFecha').value = fechaHoy;
                 document.getElementById('crearCategoria').value = "";
-                document.getElementById('crearCuenta').value = "";
+                // document.getElementById('crearCuenta').value = "";
                 document.getElementById('crearCantidadDivisa').value = "";
-                document.getElementById('crearDivisa').value = "";
+                // document.getElementById('crearDivisa').value = "";
                 document.getElementById('crearComentario').value = "";
                 document.getElementById('crearTipoMovimiento').value = "";
                 document.getElementById('crearValorCCL').value = "";
@@ -601,12 +651,16 @@
                 const data = {
                     Fecha: document.getElementById('crearFecha').value,
                     Categoria: document.getElementById('crearCategoria').value,
-                    Cuenta: document.getElementById('crearCuenta').value,
+                    // Cuenta: document.getElementById('crearCuenta').value,
+                    Cuenta: 'testCuenta',
                     CantidadDivisa: document.getElementById('crearCantidadDivisa').value,
-                    Divisa: document.getElementById('crearDivisa').value,
+                    //Divisa: document.getElementById('crearDivisa').value,
+                    Divisa: 'tes',
                     Comentario: document.getElementById('crearComentario').value,
                     TipoMovimiento: document.getElementById('crearTipoMovimiento').value,
-                    ValorCCL: document.getElementById('crearValorCCL').value
+                    ValorCCL: document.getElementById('crearValorCCL').value,
+                    DivisaId: document.getElementById('divisaSelectCrear').value,
+                    CuentaWalletId: document.getElementById('cuentaSelectCrear').value
                 };
 
                 try {
@@ -649,7 +703,8 @@
                 }
 
             });
-        }
+        }             
+
 
     </script>
 }

@@ -111,7 +111,9 @@ namespace Infra.DataAccess.Repository
                                     Divisa = reader["Divisa"].ToString(),
                                     Comentario = reader["Comentario"].ToString(),
                                     TipoMovimiento = reader["TipoMovimiento"].ToString(),
-                                    ValorCCL = reader.GetFloat("ValorCCL")
+                                    ValorCCL = reader.GetFloat("ValorCCL"),
+                                    DivisaId = reader.GetInt32("DivisaId"),
+                                    CuentaWalletId = reader.GetInt32("CuentaWalletId")
                                 });
 
                             }
@@ -169,7 +171,9 @@ namespace Infra.DataAccess.Repository
                                     Divisa = reader["Divisa"].ToString(),
                                     Comentario = reader["Comentario"].ToString(),
                                     TipoMovimiento = reader["TipoMovimiento"].ToString(),
-                                    ValorCCL = reader.GetFloat("ValorCCL")
+                                    ValorCCL = reader.GetFloat("ValorCCL"),
+                                    DivisaId = reader.GetInt32("DivisaId"),
+                                    CuentaWalletId = reader.GetInt32("CuentaWalletId")
                                 });
 
                             }
@@ -276,7 +280,9 @@ namespace Infra.DataAccess.Repository
                                      Divisa = @Divisa,
                                      Comentario = @Comentario,
                                      TipoMovimiento = @TipoMovimiento,
-                                     ValorCCL = @ValorCCL
+                                     ValorCCL = @ValorCCL,
+                                     DivisaId = @DivisaId,
+                                     CuentaWalletId = @CuentaWalletId
                                  WHERE Id = @Id";
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
@@ -290,6 +296,8 @@ namespace Infra.DataAccess.Repository
                         comando.Parameters.AddWithValue("@TipoMovimiento", xContabilidad.TipoMovimiento);
                         comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
                         comando.Parameters.AddWithValue("@Id", xContabilidad.Id);
+                        comando.Parameters.AddWithValue("@DivisaId", xContabilidad.DivisaId);
+                        comando.Parameters.AddWithValue("@CuentaWalletId", xContabilidad.CuentaWalletId);
 
                         var filasRta = await comando.ExecuteNonQueryAsync();
 
@@ -321,7 +329,9 @@ namespace Infra.DataAccess.Repository
                                           Divisa,
                                           Comentario,
                                           TipoMovimiento,
-                                          ValorCCL)
+                                          ValorCCL,
+                                          DivisaId,
+                                          CuentaWalletId)
                                          VALUES (
                                           @Fecha,
                                           @Categoria,
@@ -330,7 +340,9 @@ namespace Infra.DataAccess.Repository
                                           @Divisa,
                                           @Comentario,
                                           @TipoMovimiento,
-                                          @ValorCCL)";
+                                          @ValorCCL,
+                                          @DivisaId,
+                                          @CuentaWalletId)";
 
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
@@ -343,6 +355,8 @@ namespace Infra.DataAccess.Repository
                         comando.Parameters.AddWithValue("@Comentario", xContabilidad.Comentario);
                         comando.Parameters.AddWithValue("@TipoMovimiento", xContabilidad.TipoMovimiento);
                         comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
+                        comando.Parameters.AddWithValue("@DivisaId", xContabilidad.DivisaId);
+                        comando.Parameters.AddWithValue("@CuentaWalletId", xContabilidad.CuentaWalletId);
 
                         var filasRta = await comando.ExecuteNonQueryAsync();
 

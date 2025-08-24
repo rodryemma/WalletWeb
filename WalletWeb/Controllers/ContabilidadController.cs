@@ -1,11 +1,13 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Application.Services;
 using Domain.Model.Entity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using System.CodeDom;
+using System.Transactions;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace UI.WalletWeb.Controllers
@@ -13,10 +15,14 @@ namespace UI.WalletWeb.Controllers
     public class ContabilidadController : Controller
     {
         IContabilidadService _contabilidaService;
+        IDivisaService _divisaService;
+        ICuentaWalletService _cuentaWalletService;
 
-        public ContabilidadController(IContabilidadService contabilidadService)
+        public ContabilidadController(IContabilidadService contabilidadService, IDivisaService divisaService, ICuentaWalletService cuentaWalletService)
         {
             _contabilidaService = contabilidadService;
+            _divisaService = divisaService;
+            _cuentaWalletService = cuentaWalletService;
         }
 
         [HttpGet]
@@ -29,9 +35,11 @@ namespace UI.WalletWeb.Controllers
         public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
         {
             var FechaObtenida = ValidationHelper.ValidarFecha(fecha);
-            //var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower());
             var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
+
+            var divisasDict = await _divisaService.ObtenerDivisasDictionarioAsync(transacciones.Data, x => x.DivisaId);
+            var cuentasDict = await _cuentaWalletService.ObtenerCuentasDictionarioAsync(transacciones.Data, x => x.CuentaWalletId);
 
             var lista = transacciones.Data.Select(x => new
             {
@@ -44,7 +52,9 @@ namespace UI.WalletWeb.Controllers
                 x.Comentario,
                 x.TipoMovimiento,
                 x.ValorCCL,
-                x.MontoUsd
+                x.MontoUsd,
+                DivisaId = divisasDict.TryGetValue(x.DivisaId, out string nombre) ? nombre : "Sin divisa",
+                CuentaWalletId = cuentasDict.TryGetValue(x.CuentaWalletId, out string nombreCuenta) ? nombreCuenta : "Sin cuenta"
             }).ToList();
             return Json(new
             {
@@ -82,7 +92,9 @@ namespace UI.WalletWeb.Controllers
                 Cuenta = transaccion.Cuenta,
                 Divisa = transaccion.Divisa,
                 TipoMovimiento = transaccion.TipoMovimiento,
-                ValorCCL = transaccion.ValorCCL
+                ValorCCL = transaccion.ValorCCL,
+                DivisaId = transaccion.DivisaId,
+                CuentaWalletId = transaccion.CuentaWalletId
             };
 
             var transacciones = await _contabilidaService.EditarContabilidadPersonalAsyncService(editContabilidad);
@@ -120,7 +132,9 @@ namespace UI.WalletWeb.Controllers
                 Cuenta = transaccion.Cuenta,
                 Divisa = transaccion.Divisa,
                 TipoMovimiento = transaccion.TipoMovimiento,
-                ValorCCL = transaccion.ValorCCL
+                ValorCCL = transaccion.ValorCCL,
+                DivisaId = transaccion.DivisaId,
+                CuentaWalletId = transaccion.CuentaWalletId
             };
 
             var transacciones = await _contabilidaService.InsertarContabilidadPersonalAsyncService(editContabilidad);
