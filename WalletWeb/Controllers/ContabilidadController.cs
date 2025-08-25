@@ -15,14 +15,10 @@ namespace UI.WalletWeb.Controllers
     public class ContabilidadController : Controller
     {
         IContabilidadService _contabilidaService;
-        IDivisaService _divisaService;
-        ICuentaWalletService _cuentaWalletService;
 
-        public ContabilidadController(IContabilidadService contabilidadService, IDivisaService divisaService, ICuentaWalletService cuentaWalletService)
+        public ContabilidadController(IContabilidadService contabilidadService)
         {
             _contabilidaService = contabilidadService;
-            _divisaService = divisaService;
-            _cuentaWalletService = cuentaWalletService;
         }
 
         [HttpGet]
@@ -35,12 +31,9 @@ namespace UI.WalletWeb.Controllers
         public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
         {
             var FechaObtenida = ValidationHelper.ValidarFecha(fecha);
-            var transacciones = await _contabilidaService.ObtenerContabilidadDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
-
-            var divisasDict = await _divisaService.ObtenerDivisasDictionarioAsync(transacciones.Data, x => x.DivisaId);
-            var cuentasDict = await _cuentaWalletService.ObtenerCuentasDictionarioAsync(transacciones.Data, x => x.CuentaWalletId);
-
+            
             var lista = transacciones.Data.Select(x => new
             {
                 x.Id,
@@ -53,8 +46,9 @@ namespace UI.WalletWeb.Controllers
                 x.TipoMovimiento,
                 x.ValorCCL,
                 x.MontoUsd,
-                DivisaId = divisasDict.TryGetValue(x.DivisaId, out string nombre) ? nombre : "Sin divisa",
-                CuentaWalletId = cuentasDict.TryGetValue(x.CuentaWalletId, out string nombreCuenta) ? nombreCuenta : "Sin cuenta"
+                x.CategoriaId,
+                x.DivisaId,
+                x.CuentaWalletId
             }).ToList();
             return Json(new
             {
@@ -87,10 +81,7 @@ namespace UI.WalletWeb.Controllers
                 Id = transaccion.Id,
                 Fecha = transaccion.Fecha,
                 CantidadDivisa = transaccion.CantidadDivisa,
-                Categoria = transaccion.Categoria,
                 Comentario = transaccion.Comentario,
-                Cuenta = transaccion.Cuenta,
-                Divisa = transaccion.Divisa,
                 TipoMovimiento = transaccion.TipoMovimiento,
                 ValorCCL = transaccion.ValorCCL,
                 DivisaId = transaccion.DivisaId,
@@ -104,7 +95,7 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpPost("transacciones/crear")]
-        public async Task<IActionResult> Insertar([FromBody] ContabilidadDto transaccion)
+        public async Task<IActionResult> Insertar([FromBody] ContabilidadCreateDto transaccion)
         {
             //TODO : Validar que no exista el nombre
             if (transaccion == null)
@@ -127,14 +118,15 @@ namespace UI.WalletWeb.Controllers
             {
                 Fecha = transaccion.Fecha,
                 CantidadDivisa = transaccion.CantidadDivisa,
-                Categoria = transaccion.Categoria,
                 Comentario = transaccion.Comentario,
-                Cuenta = transaccion.Cuenta,
-                Divisa = transaccion.Divisa,
                 TipoMovimiento = transaccion.TipoMovimiento,
                 ValorCCL = transaccion.ValorCCL,
+                CategoriaId = transaccion.CategoriaId,
                 DivisaId = transaccion.DivisaId,
-                CuentaWalletId = transaccion.CuentaWalletId
+                CuentaWalletId = transaccion.CuentaWalletId,
+                Categoria = "Test",
+                Divisa = "tes",
+                Cuenta = "Test"
             };
 
             var transacciones = await _contabilidaService.InsertarContabilidadPersonalAsyncService(editContabilidad);

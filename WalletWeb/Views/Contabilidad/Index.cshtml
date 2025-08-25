@@ -120,6 +120,8 @@
                     <input type="hidden" id="editarId" />
                     <input type="hidden" id="editarSelectDivisa" />
                     <input type="hidden" id="editarSelectCuenta" />
+                    <input type="hidden" id="editarSelectCategoria" />
+
 
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -127,9 +129,18 @@
                             <input type="date" class="form-control" id="editarFecha" required />
                         </div>
 
-                        <div class="col-md-6">
+                        @* <div class="col-md-6">
                             <label for="editarCategoria" class="form-label small text-muted">Categoría</label>
                             <input type="text" class="form-control" id="editarCategoria" required />
+                        </div> *@
+
+                        <div class="col-md-6">
+                            <label for="editarCategoria" class="form-label small text-muted">
+                                Categoria
+                            </label>
+                            <select id="categoriaSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
 
                         @* <div class="col-md-6">
@@ -139,7 +150,7 @@
 
                         <div class="col-md-6">
                             <label for="editarCuenta" class="form-label small text-muted">
-                                Divisa
+                                Cuenta
                             </label>
                             <select id="cuentaSelectEditar" class="form-control" style="width: 100%;">
                                 <option value="">Seleccionar...</option>
@@ -215,14 +226,13 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="crearCategoria" class="form-label small text-muted">Categoría</label>
-                            <input type="text" class="form-control" id="crearCategoria" required />
+                            <label for="crearCategoria" class="form-label small text-muted">
+                                Categoria
+                            </label>
+                            <select id="categoriaSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
                         </div>
-
-                        @* <div class="col-md-6">
-                            <label for="crearCuenta" class="form-label small text-muted">Cuenta</label>
-                            <input type="text" class="form-control" id="crearCuenta" required />
-                        </div> *@
 
                         <div class="col-md-6">
                             <label for="crearCuenta" class="form-label small text-muted">
@@ -238,7 +248,6 @@
                             <input type="number" step="any" class="form-control" id="crearCantidadDivisa" required />
                         </div>
 
-                        @* Nuevo Divisa select *@
                         <div class="col-md-6">
                             <label for="crearDivisa" class="form-label small text-muted">
                                 Divisa
@@ -247,11 +256,6 @@
                                 <option value="">Seleccionar...</option>
                             </select>
                         </div>
-
-                        @* <div class="col-md-6">
-                            <label for="crearDivisa" class="form-label small text-muted">Divisa</label>
-                            <input type="text" class="form-control" id="crearDivisa" required />
-                        </div> *@
 
                         <div class="col-md-6">
                             <label for="crearComentario" class="form-label small text-muted">Comentario</label>
@@ -322,6 +326,13 @@
         $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
             cargarSelect2Divisa();
             cargarSelect2Cuenta();
+            cargarSelect2Categoria();
+        });
+
+        $('#editarTipoMovimiento, #crearTipoMovimiento').on('change', function() {
+            var tipoMovimiento = $(this).val();
+            $('#categoriaSelectCrear, #categoriaSelectEditar').val(null).trigger('change');
+            cargarSelect2Categoria(tipoMovimiento);
         });
 
         // Región: Cargar DolarCCL
@@ -545,13 +556,13 @@
                     // Llenar los campos del modal
                     document.getElementById('editarId').value = row.id;
                     document.getElementById('editarFecha').value = fechaFormateada;
-                    document.getElementById('editarCategoria').value = row.categoria;
                     document.getElementById('editarCantidadDivisa').value = row.cantidadDivisa;
                     document.getElementById('editarComentario').value = row.comentario;
                     document.getElementById('editarTipoMovimiento').value = row.tipoMovimiento;
                     document.getElementById('editarValorCCL').value = row.valorCCL;
-                    document.getElementById('editarSelectCuenta').value = row.cuentaWalletId;
-                    document.getElementById('editarSelectDivisa').value = row.divisaId;
+                    document.getElementById('editarSelectCategoria').value = row.categoria;
+                    document.getElementById('editarSelectCuenta').value = row.cuenta;
+                    document.getElementById('editarSelectDivisa').value = row.divisa;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -579,15 +590,11 @@
                 const data = {
                     Id: document.getElementById('editarId').value,
                     Fecha: document.getElementById('editarFecha').value,
-                    Categoria: document.getElementById('editarCategoria').value,
-                    // Cuenta: document.getElementById('editarCuenta').value,
-                    Cuenta: '',
                     CantidadDivisa: document.getElementById('editarCantidadDivisa').value,
-                    // Divisa: document.getElementById('editarDivisa').value,
-                    Divisa: '',
                     Comentario: document.getElementById('editarComentario').value,
                     TipoMovimiento: document.getElementById('editarTipoMovimiento').value,
                     ValorCCL: document.getElementById('editarValorCCL').value,
+                    CategoriaId: document.getElementById('categoriaSelectEditar').value,
                     CuentaWalletId: document.getElementById('cuentaSelectEditar').value,
                     DivisaId: document.getElementById('divisaSelectEditar').value
                 };
@@ -621,12 +628,9 @@
                 const hoy = new Date();
                 const fechaHoy = hoy.toISOString().split('T')[0];
                 document.getElementById('crearFecha').value = fechaHoy;
-                document.getElementById('crearCategoria').value = "";
-                // document.getElementById('crearCuenta').value = "";
                 document.getElementById('crearCantidadDivisa').value = "";
-                // document.getElementById('crearDivisa').value = "";
                 document.getElementById('crearComentario').value = "";
-                document.getElementById('crearTipoMovimiento').value = "";
+                document.getElementById('crearTipoMovimiento').value = "gastos";
                 document.getElementById('crearValorCCL').value = "";
                 const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
                 modalCrear.show();
@@ -650,15 +654,11 @@
 
                 const data = {
                     Fecha: document.getElementById('crearFecha').value,
-                    Categoria: document.getElementById('crearCategoria').value,
-                    // Cuenta: document.getElementById('crearCuenta').value,
-                    Cuenta: 'testCuenta',
                     CantidadDivisa: document.getElementById('crearCantidadDivisa').value,
-                    //Divisa: document.getElementById('crearDivisa').value,
-                    Divisa: 'tes',
                     Comentario: document.getElementById('crearComentario').value,
                     TipoMovimiento: document.getElementById('crearTipoMovimiento').value,
                     ValorCCL: document.getElementById('crearValorCCL').value,
+                    CategoriaId: document.getElementById('categoriaSelectCrear').value,
                     DivisaId: document.getElementById('divisaSelectCrear').value,
                     CuentaWalletId: document.getElementById('cuentaSelectCrear').value
                 };

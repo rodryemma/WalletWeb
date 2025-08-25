@@ -30,7 +30,7 @@ namespace UI.WalletWeb.Controllers
         {
             var cuentas = await _cuentaWalletService.ObtenerCuentaWalletDBFullAsyncService();
             if (!cuentas.Success) { return BadRequest(cuentas.Message); }
-
+            //TODO : Realizar un Join para traer los ids 
             var divisasDict = await _divisaService.ObtenerDivisasDictionarioAsync(cuentas.Data, x => x.DivisaId);
             
             var lista = cuentas.Data.Select(x => new

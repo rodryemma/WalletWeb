@@ -181,3 +181,45 @@ function cargarSelect2Cuenta() {
     }
 }
 
+// Región: Cargar Select Categoria
+function cargarSelect2Categoria(tipoMovimiento) {
+    const url = '/categoria/json';
+    const tipoMovimientoActual = tipoMovimiento || 'Total';
+    var modalActivo = $('.modal.show').attr('id');
+    $('#categoriaSelectCrear , #categoriaSelectEditar').select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || '',
+                    tipoMovimiento: tipoMovimientoActual
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+    if (modalActivo === 'modalEditar') {
+        const idSelect = '#categoriaSelectEditar';
+        const text = document.getElementById('editarSelectCategoria').value;
+        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
+        document.getElementById('editarSelectCategoria').value = '';
+    }
+}
+
+

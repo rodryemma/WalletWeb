@@ -16,6 +16,7 @@ namespace Application.Interfaces
         Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsyncService();
         Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<int> ids);
         Task<Dictionary<int, string>> ObtenerCuentasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector);
+        //TODO : Si no se sigue usando eliminar ObtenerCuentasDictionarioAsync()
 
     }
 }
