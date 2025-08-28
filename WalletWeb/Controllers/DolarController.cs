@@ -21,12 +21,7 @@ namespace UI.WalletWeb.Controllers
         {
             await _ambitoApi.ActualizarCotizacionAsync();
 
-            var valor = _dolarService.DolarCCL;
-
-            return Json(new
-            {
-                ccl = valor
-            });
+            return Json(_dolarService.DolarCCL);
         }
 
         [HttpGet("cclhistorico/json")]
@@ -35,12 +30,7 @@ namespace UI.WalletWeb.Controllers
             var rta = await _ambitoApi.ObtenerHistoricoCCL(fechaInicio, fechaFinal);
             if (!rta.Success) { return BadRequest(rta.Message); }
 
-            var valor = rta.Data;
-
-            return Json(new
-            {
-                cclhistorico = valor
-            });
+            return Json(rta.Data);
         }
     }
 }

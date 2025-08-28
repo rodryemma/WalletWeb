@@ -12,6 +12,7 @@ namespace Domain.Model.Entites
         public DateTime Fecha { get; set; }
         public string Nombre { get; set; }
         public string Descripcion { get; set; }
+        public string Divisa { get; set; }
         public int DivisaId { get; set; }
     }
 }

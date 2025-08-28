@@ -21,6 +21,8 @@ builder.Services.AddScoped<IDivisaRepository, DivisaRepository>();
 builder.Services.AddScoped<IDivisaService, DivisaService>();
 builder.Services.AddScoped<ICuentaWalletRepository, CuentaWalletRepository>();
 builder.Services.AddScoped<ICuentaWalletService, CuentaWalletService>();
+builder.Services.AddScoped<ITransferenciaRepository, TransferenciaRepository>();
+builder.Services.AddScoped<ITransferenciaService, TransferenciaService>();
 builder.Services.AddSingleton<IDolarService, DolarService>();
 builder.Services.AddHttpClient<IDolarArgentinaApi, DolarArgentinaApi>();
 builder.Services.AddHttpClient<IAmbitoApi, AmbitoApi>();

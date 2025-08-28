@@ -11,6 +11,7 @@ namespace Domain.Model.Interfaces
     public interface ICategoriaRepository
     {
         Task<OperationResult<List<Categoria>>> ObtenerCategoriaDBFullAsync(string xTipo);
+        Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsync(List<int> ids);
         Task<OperationResult<int>> InsertarCategoriaPersonalAsync(Categoria xCategoria);
         Task<OperationResult<int>> EditarCategoriaPersonalAsync(Categoria xCategoria);
         Task<OperationResult<int>> EliminarCategoriaPersonalAsync(int xId);

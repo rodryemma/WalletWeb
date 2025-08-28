@@ -129,11 +129,6 @@
                             <input type="date" class="form-control" id="editarFecha" required />
                         </div>
 
-                        @* <div class="col-md-6">
-                            <label for="editarCategoria" class="form-label small text-muted">Categoría</label>
-                            <input type="text" class="form-control" id="editarCategoria" required />
-                        </div> *@
-
                         <div class="col-md-6">
                             <label for="editarCategoria" class="form-label small text-muted">
                                 Categoria
@@ -142,11 +137,6 @@
                                 <option value="">Seleccionar...</option>
                             </select>
                         </div>
-
-                        @* <div class="col-md-6">
-                            <label for="editarCuenta" class="form-label small text-muted">Cuenta</label>
-                            <input type="text" class="form-control" id="editarCuenta" required />
-                        </div> *@
 
                         <div class="col-md-6">
                             <label for="editarCuenta" class="form-label small text-muted">
@@ -161,11 +151,6 @@
                             <label for="editarCantidadDivisa" class="form-label small text-muted">Cantidad Divisa</label>
                             <input type="number" step="any" class="form-control" id="editarCantidadDivisa" required />
                         </div>
-
-                        @* <div class="col-md-6">
-                            <label for="editarDivisa" class="form-label small text-muted">Divisa</label>
-                            <input type="text" class="form-control" id="editarDivisa" required />
-                        </div> *@
 
                         <div class="col-md-6">
                             <label for="editarDivisa" class="form-label small text-muted">
@@ -325,22 +310,27 @@
 
         $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
             cargarSelect2Divisa();
+            cargarEditarSelect2('divisa','#divisaSelectEditar','editarSelectDivisa');
             cargarSelect2Cuenta();
+            cargarEditarSelect2('cuentawallet','#cuentaSelectEditar','editarSelectCuenta');
             cargarSelect2Categoria();
+            cargarEditarSelect2('categoria','#categoriaSelectEditar','editarSelectCategoria');
         });
 
         $('#editarTipoMovimiento, #crearTipoMovimiento').on('change', function() {
             var tipoMovimiento = $(this).val();
             $('#categoriaSelectCrear, #categoriaSelectEditar').val(null).trigger('change');
             cargarSelect2Categoria(tipoMovimiento);
+            cargarEditarSelect2('categoria','#categoriaSelectEditar','editarSelectCategoria');
         });
 
         // Región: Cargar DolarCCL
         async function cargarDolarCCL() {
             try {
                 const url = "/ccl/json";
-                const data = await apiRequest(url);
-                document.getElementById("valorDolar").textContent = data.ccl;
+                const ccl = await apiRequest(url);
+                // document.getElementById("valorDolar").textContent = data.ccl;
+                document.getElementById("valorDolar").textContent = ccl;
             } catch (error) {
                 console.error(error);
                 document.getElementById("valorDolar").textContent = "Error al cargar";
@@ -407,7 +397,9 @@
                     data: function (d) {
                          d.tipoMovimiento = $('#tipoMovimientoSelect').val(),
                          d.fecha = $('#fechaDesde').val();
-                    }
+                    },
+                    dataSrc: ''
+
                 },
                 order: [[0, 'desc']],//Fecha descendente
                 columns: [
@@ -560,9 +552,9 @@
                     document.getElementById('editarComentario').value = row.comentario;
                     document.getElementById('editarTipoMovimiento').value = row.tipoMovimiento;
                     document.getElementById('editarValorCCL').value = row.valorCCL;
-                    document.getElementById('editarSelectCategoria').value = row.categoria;
-                    document.getElementById('editarSelectCuenta').value = row.cuenta;
-                    document.getElementById('editarSelectDivisa').value = row.divisa;
+                    document.getElementById('editarSelectCategoria').value = row.categoriaId;
+                    document.getElementById('editarSelectCuenta').value = row.cuentaWalletId;
+                    document.getElementById('editarSelectDivisa').value = row.divisaId;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -695,9 +687,9 @@
                     const fechaAux = fechaAnt.toISOString().split('T')[0]
                     const valorccl = await cargarDolarHistorico(fechaAux, fecha);
                     if(valorccl){
-                        console.log("Valor recuperado: ", valorccl.cclhistorico);
-                           if (!isNaN(valorccl.cclhistorico)) {
-                               document.getElementById("crearValorCCL").value = valorccl.cclhistorico;
+                        // console.log("Valor recuperado: ", valorccl);
+                           if (!isNaN(valorccl)) {
+                               document.getElementById("crearValorCCL").value = valorccl;
                            }
                     }
                 }

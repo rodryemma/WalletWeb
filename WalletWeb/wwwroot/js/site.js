@@ -78,7 +78,119 @@ function mostrarToast(mensaje, tipo = 'success') {
     toast.show();
 }
 
+// Región: Cargar Select Divisa
+function cargarSelect2Divisa() {
+    const url = '/divisa/json';
+    var modalActivo = $('.modal.show').attr('id');
+    $('#divisaSelectCrear , #divisaSelectEditar').select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+}
+
+// Región: Cargar Select Cuenta
+function cargarSelect2Cuenta(selectores = '#cuentaSelectCrear, #cuentaSelectEditar') {
+    const url = '/cuentawallet/json';
+    var modalActivo = $('.modal.show').attr('id');
+    $(selectores).select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || ''
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+}
+
+// Región: Cargar Select Categoria
+function cargarSelect2Categoria(tipoMovimiento) {
+    const url = '/categoria/json';
+    const tipoMovimientoActual = tipoMovimiento || 'Total';
+    var modalActivo = $('.modal.show').attr('id');
+    $('#categoriaSelectCrear , #categoriaSelectEditar').select2({
+        placeholder: 'Seleccionar...',
+        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
+        ajax: {
+            url: url,
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                return {
+                    term: params.term || '',
+                    tipoMovimiento: tipoMovimientoActual
+                };
+            },
+            processResults: function (data) {
+                return {
+                    results: data.map(function (item) {
+                        return {
+                            id: item.id,
+                            text: item.nombre
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 0
+    });
+
+}
+
+function cargarEditarSelect2(controlador, idSelect, idHidden) {
+    const url = '/' + controlador + '/ids';
+    var modalActivo = $('.modal.show').attr('id');
+    if (modalActivo === 'modalEditar') {
+        const id = document.getElementById(idHidden).value;
+        buscarSeleccionarSelect2PorId(url, idSelect, id)
+        document.getElementById(idHidden).value = '';
+    }
+}
+
 function buscarSeleccionarSelect2PorTexto(url, idselect, texto) {
+    //TODO : Modifiar la busqueda o agregar una por id directo
     //Buscamos directamente por ajax la informacion y al obtenerla la cargamos nosotros y seleccionamos.
     $.ajax({
         url: url,
@@ -103,123 +215,29 @@ function buscarSeleccionarSelect2PorTexto(url, idselect, texto) {
     });
 }
 
-// Región: Cargar Select Divisa
-function cargarSelect2Divisa() {
-    const url = '/divisa/json';
-    var modalActivo = $('.modal.show').attr('id');
-    $('#divisaSelectCrear , #divisaSelectEditar').select2({
-        placeholder: 'Seleccionar...',
-        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
-        ajax: {
-            url: url,
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    term: params.term || ''
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.nombre
-                        };
-                    })
-                };
-            },
-            cache: true
-        },
-        minimumInputLength: 0
-    });
+function buscarSeleccionarSelect2PorId(url, idselect, id) {
+    //TODO : Terminarlo - incompleto
+    //Buscamos directamente por ajax la informacion y al obtenerla la cargamos nosotros y seleccionamos.
+    const listaIds = [id]
+    $.ajax({
+        url: url,
+        type: 'POST',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(listaIds),
+        success: function (data) {
+            if (data && data.length > 0) {
+                const item = data[0];
+                const $select = $(idselect);
+                // Crear la opción y la seleccionamos
+                const nuevaOpcion = new Option(item.nombre, item.id, true, true);
+                $select.append(nuevaOpcion);
+                $select.trigger('change');
+            }
 
-    if (modalActivo === 'modalEditar') {
-        const idSelect = '#divisaSelectEditar';
-        const text = document.getElementById('editarSelectDivisa').value;
-        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
-        document.getElementById('editarSelectDivisa').value = '';
-    }
+        }
+    });
 }
 
-// Región: Cargar Select Cuenta
-function cargarSelect2Cuenta() {
-    const url = '/cuentawallet/json';
-    var modalActivo = $('.modal.show').attr('id');
-    $('#cuentaSelectCrear , #cuentaSelectEditar').select2({
-        placeholder: 'Seleccionar...',
-        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
-        ajax: {
-            url: url,
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    term: params.term || ''
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.nombre
-                        };
-                    })
-                };
-            },
-            cache: true
-        },
-        minimumInputLength: 0
-    });
-
-    if (modalActivo === 'modalEditar') {
-        const idSelect = '#cuentaSelectEditar';
-        const text = document.getElementById('editarSelectCuenta').value;
-        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
-        document.getElementById('editarSelectCuenta').value = '';
-    }
-}
-
-// Región: Cargar Select Categoria
-function cargarSelect2Categoria(tipoMovimiento) {
-    const url = '/categoria/json';
-    const tipoMovimientoActual = tipoMovimiento || 'Total';
-    var modalActivo = $('.modal.show').attr('id');
-    $('#categoriaSelectCrear , #categoriaSelectEditar').select2({
-        placeholder: 'Seleccionar...',
-        dropdownParent: modalActivo ? $('#' + modalActivo) : $('body'),
-        ajax: {
-            url: url,
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    term: params.term || '',
-                    tipoMovimiento: tipoMovimientoActual
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.data.map(function (item) {
-                        return {
-                            id: item.id,
-                            text: item.nombre
-                        };
-                    })
-                };
-            },
-            cache: true
-        },
-        minimumInputLength: 0
-    });
-
-    if (modalActivo === 'modalEditar') {
-        const idSelect = '#categoriaSelectEditar';
-        const text = document.getElementById('editarSelectCategoria').value;
-        buscarSeleccionarSelect2PorTexto(url, idSelect, text);
-        document.getElementById('editarSelectCategoria').value = '';
-    }
-}
 
 

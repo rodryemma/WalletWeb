@@ -178,6 +178,7 @@
 
         $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
             cargarSelect2Divisa();
+            cargarEditarSelect2('divisa','#divisaSelectEditar','editarSelectDivisa');
         });
 
         // Región: Cargar DataTable
@@ -190,7 +191,8 @@
                     url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
                 },
                 ajax: {
-                    url: '/cuentawallet/json'
+                    url: '/cuentawallet/json',
+                    dataSrc: ''
                 },
                 order: [[1, 'asc']],//Nombre descendente
                 columns: [
@@ -206,7 +208,7 @@
                         },
                         { data: 'nombre' },
                         { data: 'descripcion' },
-                        { data: 'divisaId' },
+                        { data: 'divisa' },
                         {
                           data: null,
                           orderable: false,

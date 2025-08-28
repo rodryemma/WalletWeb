@@ -11,6 +11,7 @@ namespace Domain.Model.Interfaces
     public interface ICuentaWalletRepository
     {
         Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsync();
+        Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletJoinDBFullAsync();
         Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsync(List<int> ids);
         Task<OperationResult<int>> InsertarCuentaWalletAsync(CuentaWallet xCuentaWallet);
         Task<OperationResult<int>> EditarCuentaWalletAsync(CuentaWallet xCuentaWallet);

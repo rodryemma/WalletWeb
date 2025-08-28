@@ -34,10 +34,24 @@ namespace UI.WalletWeb.Controllers
                 x.Descripcion
             }).ToList();
 
-            return Json(new
+            return Json(lista);
+
+        }
+
+        [HttpPost("divisa/ids")]
+        public async Task<IActionResult> GetListIds([FromBody] List<int> ids)
+        {
+            var divisa = await _divisaService.ObtenerMultiplesDivisasAsyncService(ids);
+            if (!divisa.Success) { return BadRequest(divisa.Message); }
+
+            var lista = divisa.Data.Select(x => new
             {
-                data = lista
-            });
+                x.Id,
+                x.Nombre,
+                x.Descripcion
+            }).ToList();
+
+            return Json(lista);
 
         }
 

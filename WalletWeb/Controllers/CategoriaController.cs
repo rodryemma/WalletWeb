@@ -37,10 +37,27 @@ namespace UI.WalletWeb.Controllers
                 x.Tipo,
                 x.Descripcion
             }).ToList();
-            return Json(new
+
+            return Json(lista);
+
+        }
+
+        [HttpPost("categoria/ids")]
+        public async Task<IActionResult> GetListIds([FromBody] List<int> ids)
+        {
+            var categorias = await _categoriaService.ObtenerMultiplesCategoriasAsyncService(ids);
+            if (!categorias.Success) { return BadRequest(categorias.Message); }
+
+            var lista = categorias.Data.Select(x => new
             {
-                data = lista
-            });
+                x.Id,
+                Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
+                x.Nombre,
+                x.Tipo,
+                x.Descripcion
+            }).ToList();
+
+            return Json(lista);
 
         }
 

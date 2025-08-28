@@ -50,11 +50,9 @@ namespace UI.WalletWeb.Controllers
                 x.DivisaId,
                 x.CuentaWalletId
             }).ToList();
-            return Json(new
-            {
-                data = lista
-            });
-        
+
+            return Json(lista);
+
         }
 
         [HttpPost("transacciones/editar")]

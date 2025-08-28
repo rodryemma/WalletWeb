@@ -66,6 +66,52 @@ namespace Infra.DataAccess.Repositories
 
         }
 
+        public async Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletJoinDBFullAsync()
+        {
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+
+                    var sqlString = "SELECT CW.Id, CW.Nombre, CW.Descripcion, CW.Fecha, CW.DivisaId, D.Nombre AS DIVISA " +
+                        "FROM CuentaWallet AS CW " +
+                        "JOIN Divisa AS D ON (D.Id = CW.DivisaId)";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<CuentaWallet> query = new List<CuentaWallet>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new CuentaWallet()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Descripcion = reader["Descripcion"].ToString(),
+                                    Divisa = reader["Divisa"].ToString(),
+                                    DivisaId = reader.GetInt32("DivisaId")
+                                });
+
+                            }
+                            return OperationResult<List<CuentaWallet>>.Ok(query);
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<List<CuentaWallet>>.Fail("Error al eliminar: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return OperationResult<List<CuentaWallet>>.Fail("Error al eliminar: " + ex.Message);
+                }
+            }
+
+        }
+
         public async Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsync(List<int> ids)
         {
             using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))

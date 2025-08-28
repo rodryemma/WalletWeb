@@ -19,6 +19,16 @@ namespace Application.Services
             _cuentaWalletRepository = cuentaWalletRepository;
         }
 
+        public Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsyncService()
+        {
+            return _cuentaWalletRepository.ObtenerCuentaWalletDBFullAsync();
+        }
+
+        public Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletJoinDBFullAsyncService()
+        {
+            return _cuentaWalletRepository.ObtenerCuentaWalletJoinDBFullAsync();
+        }
+
         public Task<OperationResult<int>> EditarCuentaWalletAsyncService(CuentaWallet xCuentaWallet)
         {
             return _cuentaWalletRepository.EditarCuentaWalletAsync(xCuentaWallet);
@@ -32,11 +42,6 @@ namespace Application.Services
         public Task<OperationResult<int>> InsertarCuentaWalletAsyncService(CuentaWallet xCuentaWallet)
         {
             return _cuentaWalletRepository.InsertarCuentaWalletAsync(xCuentaWallet);
-        }
-
-        public Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsyncService()
-        {
-            return _cuentaWalletRepository.ObtenerCuentaWalletDBFullAsync();
         }
 
         public Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<int> ids)

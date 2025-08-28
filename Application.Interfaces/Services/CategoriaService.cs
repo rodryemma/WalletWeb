@@ -14,6 +14,16 @@ namespace Application.Services
     {
         ICategoriaRepository _CategoriaRepository;
 
+        public Task<OperationResult<List<Categoria>>> ObtenerCategoriaDBFullAsyncService(string xTipo)
+        {
+            return _CategoriaRepository.ObtenerCategoriaDBFullAsync(xTipo);
+        }
+
+        public Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsyncService(List<int> xIds)
+        {
+            return _CategoriaRepository.ObtenerMultiplesCategoriasAsync(xIds);
+        }
+
         public CategoriaService(ICategoriaRepository xCategoriaRepository)
         {
             _CategoriaRepository = xCategoriaRepository;
@@ -33,10 +43,6 @@ namespace Application.Services
         {
             return _CategoriaRepository.InsertarCategoriaPersonalAsync(xCategoria);
         }
-
-        public Task<OperationResult<List<Categoria>>> ObtenerCategoriaDBFullAsyncService(string xTipo)
-        {
-            return _CategoriaRepository.ObtenerCategoriaDBFullAsync(xTipo);
-        }
+        
     }
 }

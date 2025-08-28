@@ -1,52 +1,30 @@
-﻿@{
-    ViewData["Title"] = "Categoría";
+﻿
+@{
+    ViewData["Title"] = "Transferencia";
 }
 
-<h2 class="mb-4 pb-2 fw-semibold text-secondary">Categoria</h2>
-
-<div class="p-3 bg-white border rounded shadow-sm mb-4">
-    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
-
-    <div class="row g-3">
-
-        <div class="col-sm-12">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por movimiento</div>
-                <div class="mt-auto">
-                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
-                        <option value="total">Total</option>
-                        <option value="gastos">Gastos</option>
-                        <option value="ingresos">Ingresos</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-</div>
+<h2 class="mb-4 pb-2 fw-semibold text-secondary">Transferencia</h2>
 
 <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-    <h4 class="fw-semibold text-secondary">Lista de Categoria</h4>
+    <h4 class="fw-semibold text-secondary">Lista de Transferencia</h4>
     <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
         <i class="bi bi-plus"></i> Agregar
     </button>
 </div>
 
 <div>
-    <table id="tablaCategoria" class="table table-striped display">
+    <table id="tablaTransferencia" class="table table-striped display">
         <thead>
             <tr>
                 <th>Fecha</th>
-                <th>Categoría</th>
-                <th>Descripción</th>             
-                <th>Tipo</th>
-                
+                <th>Cuenta envía</th>
+                <th>Cuenta Recibe</th>
+                <th>Monto</th>
+                <th>Comentario</th>
             </tr>
         </thead>
     </table>
 </div>
-
 
 <!-- Modal de creación -->
 <div class="modal fade" id="modalCrear" tabindex="-1" aria-labelledby="tituloCrear" aria-hidden="true">
@@ -55,7 +33,7 @@
 
             <div class="modal-header border-0 border-top border-3 border-primary">
                 <h5 class="modal-title fw-semibold text-secondary" id="tituloCrear">
-                    Crear categoría
+                    Crear transferencia
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
             </div>
@@ -69,24 +47,37 @@
                         </div>
 
                         <div class="col-md-6">
-                            <label for="crearNombre" class="form-label small text-muted">Nombre</label>
-                            <input type="text" class="form-control" id="crearNombre" required />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="crearDescripcion" class="form-label small text-muted">Descripción</label>
-                            <input type="text" class="form-control" id="crearDescripcion" required />
-                        </div>                                               
-
-                        <div class="col-md-6">
-                            <label for="crearTipo" class="form-label small text-muted">
-                                Tipo
+                            <label for="crearCuentaEnvia" class="form-label small text-muted">
+                                Cuenta Envía
                             </label>
-                            <select class="form-control" id="crearTipo">
-                                <option value="ingresos">Ingresos</option>
-                                <option value="gastos">Gastos</option>
+                            <select id="cuentaEnviaSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
                             </select>
                         </div>
+
+                        <div class="col-md-6">
+                            <label for="crearCuentaRecibe" class="form-label small text-muted">
+                                Cuenta Recibe
+                            </label>
+                            <select id="cuentaRecibeSelectCrear" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="crearMonto" class="form-label small text-muted">Monto</label>
+                            <input type="number" class="form-control" id="crearMonto" 
+                                   step="0.001"
+                                   min="0"
+                                   placeholder="0.000" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="crearComentario" class="form-label small text-muted">Comentario</label>
+                            <input type="text" class="form-control" id="crearComentario" required />
+                        </div>
+
+                        
                     </div>
                 </form>
 
@@ -139,30 +130,49 @@
             <div class="modal-body p-4">
                 <form id="formEditar">
                     <input type="hidden" id="editarId" />
+                    <input type="hidden" id="editarSelectCuentaEnvia" />
+                    <input type="hidden" id="editarSelectCuentaRecibe" />
 
                     <div class="row g-3">
                         <div class="col-md-6">
-                            <label for="editarFecha" class="form-label small text-muted">Fecha</label>
+                            <label for="editarFecha" class="form-label small text-muted">
+                                Fecha
+                            </label>
                             <input type="date" class="form-control" id="editarFecha" required />
                         </div>
 
                         <div class="col-md-6">
-                            <label for="editarNombre" class="form-label small text-muted">Nombre</label>
-                            <input type="text" class="form-control" id="editarNombre" required />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="editarDescripcion" class="form-label small text-muted">Descripción</label>
-                            <input type="text" class="form-control" id="editarDescripcion" required />
-                        </div>
-
-                        <div class="col-md-6">
-                            <label for="editarTipo" class="form-label small text-muted">Tipo</label>
-                            <select class="form-control" id="editarTipo">
-                                <option value="ingresos">Ingresos</option>
-                                <option value="gastos">Gastos</option>
+                            <label for="editarCuentaEnvia" class="form-label small text-muted">
+                                Cuenta Envía
+                            </label>
+                            <select id="cuentaEnviaSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
                             </select>
                         </div>
+
+                        <div class="col-md-6">
+                            <label for="editarCuentaRecibe" class="form-label small text-muted">
+                                Cuenta Recibe
+                            </label>
+                            <select id="cuentaRecibeSelectEditar" class="form-control" style="width: 100%;">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="editarMonto" class="form-label small text-muted">
+                                Monto
+                            </label>
+                            <input type="text" class="form-control" id="editarMonto" required />
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="editarComentario" class="form-label small text-muted">
+                                Comentario
+                            </label>
+                            <input type="text" class="form-control" id="editarComentario" required />
+                        </div>                       
+
                     </div>
                 </form>
 
@@ -175,78 +185,82 @@
     </div>
 </div>
 
-
 @section Styles {
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 }
 
 @section Scripts {
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         document.addEventListener("DOMContentLoaded", async () => {
+            // cargarDateDesdeHasta();
             cargarModalEditar();
             cargarModalCrear();
 
-            await guardarCategoria();
-            await eliminarCategoria();
-            await editarCategoria();
+            await eliminarTransaccion();
+            await editarTransaccion();
+            await guardarTransaccion();
         });
+
+        $('#modalCrear, #modalEditar').on('shown.bs.modal', function () {
+            cargarSelect2Cuenta('#cuentaEnviaSelectCrear, #cuentaEnviaSelectEditar, #cuentaRecibeSelectCrear, #cuentaRecibeSelectEditar');
+            cargarEditarSelect2('cuentawallet','#cuentaEnviaSelectEditar, #cuentaRecibeSelectEditar','editarSelectCuentaEnvia, editarSelectCuentaRecibe');
+        });
+                 
+
         // Región: Cargar DataTable
         $(document).ready(function () {
-                let tabla = $('#tablaCategoria').DataTable({
-                responsive: true,
-                paging: true,
-                destroy: true,
-                language: {
-                    url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
-                },
-                ajax: {
-                    url: '/categoria/json',
-                    data: function (d) {
-                         d.tipoMovimiento = $('#tipoMovimientoSelect').val();
-                    },
+            let tabla = $('#tablaTransferencia').DataTable({
+            responsive: true,
+            paging: true,
+            destroy: true,
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/es-ES.json'
+            },
+            ajax: {
+                url: '/transferencia/json',
                     dataSrc: ''
-                },
-                order: [[1, 'asc']],//Categoria ascendente
-                columns: [
-                        {
-                          data: 'fecha',
-                          render: function (data, type, row) {
-                              if (type === 'display' || type === 'filter') {
-                                  const date = new Date(data);
-                                  return date.toLocaleDateString();
-                              }
-                              return data;
+            },
+            order: [[0, 'desc']],//Nombre descendente
+            columns: [
+                    {
+                      data: 'fecha',
+                      render: function (data, type, row) {
+                          if (type === 'display' || type === 'filter') {
+                              const date = new Date(data);
+                              return date.toLocaleDateString();
                           }
-                        },
-                        { data: 'nombre' },
-                        { data: 'descripcion' },
-                                                
-                        { data: 'tipo' },                        
-                        {
-                          data: null,
-                          orderable: false,
-                          searchable: false,
-                          render: function (data, type, row) {
-                              return `
-                                <button class="btn-editar btn btn-sm btn-outline-primary" data-id="${row.id}">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn-eliminar btn btn-sm btn-outline-danger" data-id="${row.id}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                              `;
-                          }
-                        }
-                        ]
+                          return data;
+                      }
+                    },
+                    { data: 'cuentaEnvia' },
+                    { data: 'cuentaRecibe' },
+                    { data: 'monto' },
+                    { data: 'comentario' },
+                    {
+                      data: null,
+                      orderable: false,
+                      searchable: false,
+                      render: function (data, type, row) {
+                          return `
+                            <button class="btn-editar btn btn-sm btn-outline-primary" data-id="${row.id}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn-eliminar btn btn-sm btn-outline-danger" data-id="${row.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                          `;
+                      }
+                    }
+                    ]
             });
-            //Recargar table por tipomovimiento
-            $('#tipoMovimientoSelect').change(function () {
-            tabla.ajax.reload();
-            });
-           
+
         });
+
 
         // Región: Botón Crear Abrir Modal
         function cargarModalCrear(){
@@ -256,16 +270,15 @@
                 const hoy = new Date();
                 const fechaHoy = hoy.toISOString().split('T')[0];
                 document.getElementById('crearFecha').value = fechaHoy;
-                document.getElementById('crearNombre').value = "";
-                document.getElementById('crearDescripcion').value = "";
-                document.getElementById('crearTipo').value = "";
+                document.getElementById('crearMonto').value = "";
+                document.getElementById('crearComentario').value = "";
                 const modalCrear = new bootstrap.Modal(document.getElementById('modalCrear'));
                 modalCrear.show();
             });
         }
 
         // Región: Post Crear
-        async function guardarCategoria(){
+        async function guardarTransaccion(){
             const btnGuardar = document.getElementById('btnGuardarNuevo');
             const form = document.getElementById("formCrear");
 
@@ -278,19 +291,19 @@
                 }
 
                 btnGuardar.disabled = true;
-
                 const data = {
                     Fecha: document.getElementById('crearFecha').value,
-                    Nombre: document.getElementById('crearNombre').value,
-                    Descripcion: document.getElementById('crearDescripcion').value,
-                    Tipo: document.getElementById('crearTipo').value
+                    CuentaEnviaId: document.getElementById('cuentaEnviaSelectCrear').value,
+                    CuentaRecibeId: document.getElementById('cuentaRecibeSelectCrear').value,
+                    Monto: document.getElementById('crearMonto').value,
+                    Comentario: document.getElementById('crearComentario').value
                 };
 
                 try {
-                    const url = "/categoria/crear";
+                    const url = "/transferencia/crear";
                     await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
-                        $('#tablaCategoria').DataTable().ajax.reload();
+                        $('#tablaTransferencia').DataTable().ajax.reload();
                     }
                     // Cerrar modal
                     const modalElement = document.getElementById('modalCrear');
@@ -307,53 +320,9 @@
             });
         }
 
-        // Región: Botón Eliminar Abrir Modal
-        let idAEliminar = null;
-        document.querySelector('#tablaCategoria').addEventListener('click', function (e) {
-            const btnEliminar = e.target.closest('.btn-eliminar');
-            if (btnEliminar) {
-
-                idAEliminar = btnEliminar.dataset.id;
-                document.getElementById('modalConfirmarEliminar').dataset.id = idAEliminar;
-
-                const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
-                modal.show();
-            }
-        });
-
-        // Región: Post Eliminar
-        async function eliminarCategoria(){
-            const btnEliminar = document.getElementById('btnConfirmarEliminar');
-
-            btnEliminar.addEventListener('click', async () => {
-                if (typeof idAEliminar !== 'undefined' && idAEliminar !== null) {
-                    btnEliminar.disabled = true;
-                    const data = { id: idAEliminar };
-                    try {
-                        const url = "/categoria/eliminar";
-                        await apiRequest(url, "POST", data);
-                        if (window.$ && $.fn.DataTable) {
-                            $('#tablaCategoria').DataTable().ajax.reload();
-                        }
-                        idAEliminar = null;
-
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
-                        if (modal) modal.hide();
-
-                        mostrarToast('Registro eliminado correctamente', 'success');
-                    } catch(error) {
-                        console.error('Error al guardar:', error);
-                        mostrarToast(error.message, 'danger');
-                    } finally {
-                        btnEliminar.disabled = false;
-                    }
-                }
-            });
-        }
-
         // Región: Botón Editar Abrir Modal
         function cargarModalEditar(){
-            const tabla = document.getElementById('tablaCategoria');
+            const tabla = document.getElementById('tablaTransferencia');
 
             tabla.addEventListener('click', function (event) {
                 //const target = event.target;
@@ -368,7 +337,7 @@
                     const tr = btnEditar.closest('tr');
 
                     // Usamos DataTables para obtener la data
-                    const row = $('#tablaCategoria').DataTable().row(tr).data();
+                    const row = $('#tablaTransferencia').DataTable().row(tr).data();
 
                     if (!row) {
                         console.error('No se encontró la fila en DataTable');
@@ -380,9 +349,10 @@
                     // Llenar los campos del modal
                     document.getElementById('editarId').value = row.id;
                     document.getElementById('editarFecha').value = fechaFormateada;
-                    document.getElementById('editarNombre').value = row.nombre;
-                    document.getElementById('editarDescripcion').value = row.descripcion;
-                    document.getElementById('editarTipo').value = row.tipo;
+                    document.getElementById('editarSelectCuentaEnvia').value = row.cuentaEnviaId;
+                    document.getElementById('editarSelectCuentaRecibe').value = row.cuentaRecibeId;
+                    document.getElementById('editarMonto').value = row.monto;
+                    document.getElementById('editarComentario').value = row.comentario;
 
                     // Mostrar el modal
                     const modalEditar = new bootstrap.Modal(document.getElementById('modalEditar'));
@@ -392,7 +362,7 @@
         }
 
         // Región: Post Editar
-        async function editarCategoria(){
+        async function editarTransaccion(){
             const btnGuardar = document.getElementById('btnGuardarCambios');
             const form = document.getElementById("formEditar");
 
@@ -410,16 +380,17 @@
                 const data = {
                     Id: document.getElementById('editarId').value,
                     Fecha: document.getElementById('editarFecha').value,
-                    Nombre: document.getElementById('editarNombre').value,
-                    Descripcion: document.getElementById('editarDescripcion').value,
-                    Tipo: document.getElementById('editarTipo').value
+                    CuentaEnviaId: document.getElementById('cuentaEnviaSelectEditar').value,
+                    CuentaRecibeId: document.getElementById('cuentaRecibeSelectEditar').value,
+                    Monto: document.getElementById('editarMonto').value,
+                    Comentario: document.getElementById('editarComentario').value
                 };
 
                 try  {
-                    const url = "/categoria/editar";
+                    const url = "/transferencia/editar";
                     await apiRequest(url, "POST", data);
                     if (window.$ && $.fn.DataTable) {
-                        $('#tablaCategoria').DataTable().ajax.reload();
+                        $('#tablaTransferencia').DataTable().ajax.reload();
                     }
                     // Cerrar el modal de Bootstrap
                     const modalElement = document.getElementById('modalEditar');
@@ -436,6 +407,51 @@
             });
         }
 
-    </script>
-}
+        // Región: Botón Eliminar Abrir Modal
+        let idAEliminar = null;
+        document.querySelector('#tablaTransferencia').addEventListener('click', function (e) {
+            const btnEliminar = e.target.closest('.btn-eliminar');
+            if (btnEliminar) {
 
+                idAEliminar = btnEliminar.dataset.id;
+                document.getElementById('modalConfirmarEliminar').dataset.id = idAEliminar;
+
+                const modal = new bootstrap.Modal(document.getElementById('modalConfirmarEliminar'));
+                modal.show();
+            }
+        });
+
+         // Región: Post Eliminar
+        async function eliminarTransaccion(){
+            const btnEliminar = document.getElementById('btnConfirmarEliminar');
+
+            btnEliminar.addEventListener('click', async () => {
+                if (typeof idAEliminar !== 'undefined' && idAEliminar !== null) {
+                    btnEliminar.disabled = true;
+                    const data = { id: idAEliminar };
+                    try {
+                        const url = "/transferencia/eliminar";
+                        await apiRequest(url, "POST", data);
+                        if (window.$ && $.fn.DataTable) {
+                            $('#tablaTransferencia').DataTable().ajax.reload();
+                        }
+                        idAEliminar = null;
+
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('modalConfirmarEliminar'));
+                        if (modal) modal.hide();
+
+                        mostrarToast('Registro eliminado correctamente', 'success');
+                    } catch(error) {
+                        console.error('Error al guardar:', error);
+                        mostrarToast(error.message, 'danger');
+                    } finally {
+                        btnEliminar.disabled = false;
+                    }
+                }
+            });
+        }
+
+    </script>
+
+
+}

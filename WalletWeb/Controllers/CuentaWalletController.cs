@@ -28,10 +28,8 @@ namespace UI.WalletWeb.Controllers
         [HttpGet("cuentawallet/json")]
         public async Task<IActionResult> GetCuentaWallet()
         {
-            var cuentas = await _cuentaWalletService.ObtenerCuentaWalletDBFullAsyncService();
+            var cuentas = await _cuentaWalletService.ObtenerCuentaWalletJoinDBFullAsyncService();
             if (!cuentas.Success) { return BadRequest(cuentas.Message); }
-            //TODO : Realizar un Join para traer los ids 
-            var divisasDict = await _divisaService.ObtenerDivisasDictionarioAsync(cuentas.Data, x => x.DivisaId);
             
             var lista = cuentas.Data.Select(x => new
             {
@@ -39,14 +37,30 @@ namespace UI.WalletWeb.Controllers
                 Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
                 x.Nombre,
                 x.Descripcion,
-                //Usamos el diccionario creado para dar el id a la divisa
-                DivisaId = divisasDict.TryGetValue(x.DivisaId, out string nombre) ? nombre : "Sin divisa"
+                x.DivisaId,
+                x.Divisa
             }).ToList();
 
-            return Json(new
+            return Json(lista);
+
+        }
+
+        [HttpPost("cuentawallet/ids")]
+        public async Task<IActionResult> GetListIds([FromBody] List<int> ids)
+        {
+            var cuentas = await _cuentaWalletService.ObtenerMultiplesCuentasAsyncService(ids);
+            if (!cuentas.Success) { return BadRequest(cuentas.Message); }
+
+            var lista = cuentas.Data.Select(x => new
             {
-                data = lista
-            });
+                x.Id,
+                Fecha = x.Fecha.ToString("yyyy-MM-ddTHH:mm:ss"),
+                x.Nombre,
+                x.Descripcion,
+                x.DivisaId
+            }).ToList();
+
+            return Json(lista);
 
         }
 

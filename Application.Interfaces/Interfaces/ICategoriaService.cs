@@ -11,6 +11,7 @@ namespace Application.Interfaces
     public interface ICategoriaService
     {
         Task<OperationResult<List<Categoria>>> ObtenerCategoriaDBFullAsyncService(string xTipo);
+        Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsyncService(List<int> xIds);
         Task<OperationResult<int>> InsertarCategoriaPersonalAsyncService(Categoria xCategoria);
         Task<OperationResult<int>> EditarCategoriaPersonalAsyncService(Categoria xCategoria);
         Task<OperationResult<int>> EliminarCategoriaPersonalAsyncService(int xId);

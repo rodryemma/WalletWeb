@@ -68,11 +68,64 @@ namespace Infra.DataAccess.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<List<Categoria>>.Fail("Error al eliminar: " + ex.Message);
+                    return OperationResult<List<Categoria>>.Fail("Error al consultar: " + ex.Message);
                 }
                 catch (Exception ex)
                 {
-                    return OperationResult<List<Categoria>>.Fail("Error al eliminar: " + ex.Message);
+                    return OperationResult<List<Categoria>>.Fail("Error al consultar: " + ex.Message);
+                }
+            }
+
+        }
+
+        public async Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsync(List<int> ids)
+        {
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                if (ids == null || !ids.Any())
+                {
+                    return OperationResult<List<Categoria>>.Ok(new List<Categoria>());
+                }
+
+                try
+                {
+
+                    var parametros = string.Join(",", ids.Select((id, index) => $"@id{index}"));
+                    var sqlString = $"SELECT * FROM Categoria WHERE Id IN ({parametros}) ORDER BY Nombre DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        for (int i = 0; i < ids.Count; i++)
+                        {
+                            Comando.Parameters.AddWithValue($"@id{i}", ids[i]);
+                        }
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Categoria> query = new List<Categoria>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Categoria()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Tipo = reader["Tipo"].ToString(),
+                                    Descripcion = reader["Descripcion"].ToString()
+                                });
+
+                            }
+                            return OperationResult<List<Categoria>>.Ok(query);
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<List<Categoria>>.Fail("Error al buscar: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return OperationResult<List<Categoria>>.Fail("Error al buscar: " + ex.Message);
                 }
             }
 
@@ -114,7 +167,7 @@ namespace Infra.DataAccess.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
+                    return OperationResult<int>.Fail("Error al insertar: " + ex.Message);
                 }
             }
         }
@@ -152,7 +205,7 @@ namespace Infra.DataAccess.Repositories
                 }
                 catch (MySqlException ex)
                 {
-                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
+                    return OperationResult<int>.Fail("Error al actualizar: " + ex.Message);
                 }
             }
         }
