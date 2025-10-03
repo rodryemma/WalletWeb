@@ -13,6 +13,7 @@ namespace Domain.Model.Interfaces
         Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletDBFullAsync();
         Task<OperationResult<List<CuentaWallet>>> ObtenerCuentaWalletJoinDBFullAsync();
         Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsync(List<int> ids);
+        Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsync(List<string> nombres);
         Task<OperationResult<int>> InsertarCuentaWalletAsync(CuentaWallet xCuentaWallet);
         Task<OperationResult<int>> EditarCuentaWalletAsync(CuentaWallet xCuentaWallet);
         Task<OperationResult<int>> EliminarCuentaWalletAsync(int xId);

@@ -13,6 +13,10 @@ namespace Application.Services
     public class CategoriaService : ICategoriaService
     {
         ICategoriaRepository _CategoriaRepository;
+        public CategoriaService(ICategoriaRepository xCategoriaRepository)
+        {
+            _CategoriaRepository = xCategoriaRepository;
+        }
 
         public Task<OperationResult<List<Categoria>>> ObtenerCategoriaDBFullAsyncService(string xTipo)
         {
@@ -24,9 +28,9 @@ namespace Application.Services
             return _CategoriaRepository.ObtenerMultiplesCategoriasAsync(xIds);
         }
 
-        public CategoriaService(ICategoriaRepository xCategoriaRepository)
+        public Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsyncService(List<string> xNombres, string xTipo)
         {
-            _CategoriaRepository = xCategoriaRepository;
+            return _CategoriaRepository.ObtenerMultiplesCategoriasAsync(xNombres, xTipo);
         }
 
         public Task<OperationResult<int>> EditarCategoriaPersonalAsyncService(Categoria xCategoria)

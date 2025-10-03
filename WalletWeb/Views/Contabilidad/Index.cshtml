@@ -53,6 +53,8 @@
 
 </div>
 
+@* @Html.Partial("_ImportadorModal") *@
+
 <div class="d-flex justify-content-between align-items-center mb-3 mt-5">
     <h4 class="fw-semibold text-secondary">Lista de Transacciones</h4>
     <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
@@ -77,6 +79,7 @@
     </table>
 </div>
 
+@Html.Partial("_ImportadorModal")
 
 <!-- Modal de Eliminación -->
 <div class="modal fade" id="modalConfirmarEliminar" tabindex="-1" aria-labelledby="tituloModal" aria-hidden="true">

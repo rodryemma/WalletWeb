@@ -43,6 +43,11 @@ namespace Application.Services
             return _DivisaRepository.ObtenerMultiplesDivisasAsync(xIds);
         }
 
+        public Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsyncService(List<string> xNombres)
+        {
+            return _DivisaRepository.ObtenerMultiplesDivisasAsync(xNombres);
+        }
+
         public async Task<Dictionary<int, string>> ObtenerDivisasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector)
         {
             var divisaIds = entidades.Select(divisaIdSelector).Distinct().ToList();

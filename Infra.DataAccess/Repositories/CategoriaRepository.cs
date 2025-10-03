@@ -131,6 +131,59 @@ namespace Infra.DataAccess.Repositories
 
         }
 
+        public async Task<OperationResult<List<Categoria>>> ObtenerMultiplesCategoriasAsync(List<string> nombres, string tipo)
+        {
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                if (nombres == null || !nombres.Any())
+                {
+                    return OperationResult<List<Categoria>>.Ok(new List<Categoria>());
+                }
+
+                try
+                {
+
+                    var parametros = string.Join(",", nombres.Select((id, index) => $"@id{index}"));
+                    var sqlString = $"SELECT * FROM Categoria WHERE Nombre IN ({parametros}) AND Tipo = '{tipo}' ORDER BY Nombre DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        for (int i = 0; i < nombres.Count; i++)
+                        {
+                            Comando.Parameters.AddWithValue($"@id{i}", nombres[i]);
+                        }
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Categoria> query = new List<Categoria>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Categoria()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Tipo = reader["Tipo"].ToString(),
+                                    Descripcion = reader["Descripcion"].ToString()
+                                });
+
+                            }
+                            return OperationResult<List<Categoria>>.Ok(query);
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<List<Categoria>>.Fail("Error al buscar: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return OperationResult<List<Categoria>>.Fail("Error al buscar: " + ex.Message);
+                }
+            }
+
+        }
+
         public async Task<OperationResult<int>> InsertarCategoriaPersonalAsync(Categoria xCategoria)
         {
 

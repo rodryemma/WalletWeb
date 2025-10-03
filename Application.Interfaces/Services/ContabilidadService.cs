@@ -99,6 +99,7 @@ namespace Application.Services
             }).ToList();
             return OperationResult<List<ContabilidadDto>>.Ok(movimiento);
         }
+
         public DataTable ObtenerContabilidadDBFullService()
         {
             return _ContabilidadRepository.ObtenerContabilidadDBFull();
@@ -117,6 +118,11 @@ namespace Application.Services
         public async Task<OperationResult<int>> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad)
         {
             return await _ContabilidadRepository.InsertarContabilidadPersonalAsync(xContabilidad);
+        }
+
+        public async Task<OperationResult<int>> InsertarMultipleContabilidadPersonalAsyncService(List<Contabilidad> xContabilidad)
+        {
+            return await _ContabilidadRepository.InsertarMultipleContabilidadPersonalAsync(xContabilidad);
         }
 
         public async Task<OperationResult<int>> EliminarContabilidadPersonalAsyncService(int xId)

@@ -16,6 +16,7 @@ namespace Application.Interfaces
         Task<OperationResult<int>> EliminarCuentaWalletAsyncService(int xId);
         Task<OperationResult<int>> InsertarCuentaWalletAsyncService(CuentaWallet xCuentaWallet);        
         Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<int> ids);
+        Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<string> nombres);
         Task<Dictionary<int, string>> ObtenerCuentasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector);
         //TODO : Si no se sigue usando eliminar ObtenerCuentasDictionarioAsync()
 

@@ -400,7 +400,8 @@ namespace Infra.DataAccess.Repository
                                           TipoMovimiento,
                                           ValorCCL,
                                           DivisaId,
-                                          CuentaWalletId)
+                                          CuentaWalletId,
+                                          CategoriaId)
                                          VALUES (
                                           @Fecha,
                                           @Categoria,
@@ -411,7 +412,8 @@ namespace Infra.DataAccess.Repository
                                           @TipoMovimiento,
                                           @ValorCCL,
                                           @DivisaId,
-                                          @CuentaWalletId)";
+                                          @CuentaWalletId,
+                                          @CategoriaId)";
 
 
                     using (MySqlCommand comando = new MySqlCommand(sqlString, c))
@@ -426,6 +428,8 @@ namespace Infra.DataAccess.Repository
                         comando.Parameters.AddWithValue("@ValorCCL", xContabilidad.ValorCCL);
                         comando.Parameters.AddWithValue("@DivisaId", xContabilidad.DivisaId);
                         comando.Parameters.AddWithValue("@CuentaWalletId", xContabilidad.CuentaWalletId);
+                        comando.Parameters.AddWithValue("@CategoriaId", xContabilidad.CategoriaId);
+
 
                         var filasRta = await comando.ExecuteNonQueryAsync();
 
@@ -433,6 +437,72 @@ namespace Infra.DataAccess.Repository
                             return OperationResult<int>.Ok(filasRta, "Insertado correctamente");
                         else
                             return OperationResult<int>.Fail("No se insertó el registro");
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<int>.Fail("Error al eliminar: " + ex.Message);
+                }
+            }
+        }
+
+        public async Task<OperationResult<int>> InsertarMultipleContabilidadPersonalAsync(List<Contabilidad> listaContabilidad)
+        {
+
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+                    var sql = new StringBuilder();
+                    sql.Append(@"INSERT INTO ContabilidadPersonal (                                          
+                      Fecha,
+                      Cateria,
+                      Cuenta,
+                      CantidadDivisa,
+                      Divisa,
+                      Comentario,
+                      TipoMovimiento,
+                      ValorCCL,
+                      DivisaId,
+                      CuentaWalletId,
+                      CategoriaId) VALUES ");
+
+                    var parametros = new List<MySqlParameter>();
+                    var valores = new List<string>();
+
+                    for (int i = 0; i < listaContabilidad.Count; i++)
+                    {
+                        valores.Add($@"(@Fecha{i}, @Categoria{i}, @Cuenta{i}, @CantidadDivisa{i}, 
+                          @Divisa{i}, @Comentario{i}, @TipoMovimiento{i}, @ValorCCL{i}, 
+                          @DivisaId{i}, @CuentaWalletId{i}, @CategoriaId{i})");
+
+                        // Agregar parámetros para este registro
+                        parametros.Add(new MySqlParameter($"@Fecha{i}", listaContabilidad[i].Fecha.ToString("yyyy-MM-dd HH:mm:ss")));
+                        parametros.Add(new MySqlParameter($"@Categoria{i}", listaContabilidad[i].Categoria));
+                        parametros.Add(new MySqlParameter($"@Cuenta{i}", listaContabilidad[i].Cuenta));
+                        parametros.Add(new MySqlParameter($"@CantidadDivisa{i}", listaContabilidad[i].CantidadDivisa));
+                        parametros.Add(new MySqlParameter($"@Divisa{i}", listaContabilidad[i].Divisa));
+                        parametros.Add(new MySqlParameter($"@Comentario{i}", listaContabilidad[i].Comentario));
+                        parametros.Add(new MySqlParameter($"@TipoMovimiento{i}", listaContabilidad[i].TipoMovimiento));
+                        parametros.Add(new MySqlParameter($"@ValorCCL{i}", listaContabilidad[i].ValorCCL));
+                        parametros.Add(new MySqlParameter($"@DivisaId{i}", listaContabilidad[i].DivisaId));
+                        parametros.Add(new MySqlParameter($"@CuentaWalletId{i}", listaContabilidad[i].CuentaWalletId));
+                        parametros.Add(new MySqlParameter($"@CategoriaId{i}", listaContabilidad[i].CategoriaId));
+
+                    }
+
+                    sql.Append(string.Join(", ", valores));
+
+                    using (MySqlCommand comando = new MySqlCommand(sql.ToString(), c))
+                    {
+                        comando.Parameters.AddRange(parametros.ToArray());
+
+                        var filasRta = await comando.ExecuteNonQueryAsync();
+
+                        if (filasRta > 0)
+                            return OperationResult<int>.Ok(filasRta, $"Se insertaron {filasRta} registros correctamente");
+                        else
+                            return OperationResult<int>.Fail("No se insertó ningún registro");
                     }
                 }
                 catch (MySqlException ex)

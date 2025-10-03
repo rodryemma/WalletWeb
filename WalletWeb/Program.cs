@@ -23,6 +23,7 @@ builder.Services.AddScoped<ICuentaWalletRepository, CuentaWalletRepository>();
 builder.Services.AddScoped<ICuentaWalletService, CuentaWalletService>();
 builder.Services.AddScoped<ITransferenciaRepository, TransferenciaRepository>();
 builder.Services.AddScoped<ITransferenciaService, TransferenciaService>();
+builder.Services.AddScoped<IExcelService, ExcelService>();
 builder.Services.AddSingleton<IDolarService, DolarService>();
 builder.Services.AddHttpClient<IDolarArgentinaApi, DolarArgentinaApi>();
 builder.Services.AddHttpClient<IAmbitoApi, AmbitoApi>();

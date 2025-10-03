@@ -113,6 +113,56 @@ namespace Infra.DataAccess.Repositories
 
         }
 
+        public async Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsync(List<string> nombres)
+        {
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                if (nombres == null || !nombres.Any())
+                {
+                    return OperationResult<List<Divisa>>.Ok(new List<Divisa>());
+                }
+
+                try
+                {
+
+                    var parametros = string.Join(",", nombres.Select((id, index) => $"@id{index}"));
+                    var sqlString = $"SELECT * FROM Divisa WHERE Nombre IN ({parametros}) ORDER BY Nombre DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        for (int i = 0; i < nombres.Count; i++)
+                        {
+                            Comando.Parameters.AddWithValue($"@id{i}", nombres[i]);
+                        }
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Divisa> query = new List<Divisa>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Divisa()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Nombre = reader["Nombre"].ToString(),
+                                    Descripcion = reader["Descripcion"].ToString()
+                                });
+
+                            }
+                            return OperationResult<List<Divisa>>.Ok(query);
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return OperationResult<List<Divisa>>.Fail("Error al buscar: " + ex.Message);
+                }
+            }
+
+        }
         public async Task<OperationResult<int>> InsertarDivisaAsync(Divisa xDivisa)
         {
 

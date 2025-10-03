@@ -12,6 +12,7 @@ namespace Domain.Model.Interfaces
     {
         Task<OperationResult<List<Divisa>>> ObtenerDivisaDBFullAsync();
         Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsync(List<int> xIds);
+        Task<OperationResult<List<Divisa>>> ObtenerMultiplesDivisasAsync(List<string> xNombres);
         Task<OperationResult<int>> InsertarDivisaAsync(Divisa xDivisa);
         Task<OperationResult<int>> EditarDivisaAsync(Divisa xDivisa);
         Task<OperationResult<int>> EliminarDivisaAsync(int xId);

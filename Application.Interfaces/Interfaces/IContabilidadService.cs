@@ -20,6 +20,7 @@ namespace Application.Interfaces
         Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad, string xValorCCL);
         Task<OperationResult<int>> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
         Task<OperationResult<int>> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad);
+        Task<OperationResult<int>> InsertarMultipleContabilidadPersonalAsyncService(List<Contabilidad> xContabilidad);
         Task<OperationResult<int>> EliminarContabilidadPersonalAsyncService(int xId);
     }
 }

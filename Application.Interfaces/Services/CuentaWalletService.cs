@@ -49,6 +49,11 @@ namespace Application.Services
             return _cuentaWalletRepository.ObtenerMultiplesCuentasAsync(ids);
         }
 
+        public Task<OperationResult<List<CuentaWallet>>> ObtenerMultiplesCuentasAsyncService(List<string> nombres)
+        {
+            return _cuentaWalletRepository.ObtenerMultiplesCuentasAsync(nombres);
+        }
+
         public async Task<Dictionary<int, string>> ObtenerCuentasDictionarioAsync<T>(IEnumerable<T> entidades, Func<T, int> divisaIdSelector)
         {
             var divisaIds = entidades.Select(divisaIdSelector).Distinct().ToList();

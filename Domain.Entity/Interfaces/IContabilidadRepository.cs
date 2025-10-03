@@ -19,6 +19,7 @@ namespace Domain.Model.Interfaces
         Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad, string xValorCCL);
         Task<OperationResult<int>> EditarContabilidadPersonalAsync(Contabilidad xContabilidad);
         Task<OperationResult<int>> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad);
+        Task<OperationResult<int>> InsertarMultipleContabilidadPersonalAsync(List<Contabilidad> listaContabilidad);
         Task<OperationResult<int>> EliminarContabilidadPersonalAsync(int xId);
     }
 }
