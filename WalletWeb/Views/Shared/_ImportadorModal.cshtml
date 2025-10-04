@@ -38,17 +38,21 @@
 
                                 <!-- Información del archivo seleccionado -->
                                 <div id="fileInfoAlert" class="alert alert-info file-info d-none">
-                                    <div class="d-flex align-items-center justify-content-between">
+
+                                    <p class="mb-0">¿Estás seguro que deseas importar este archivo Excel?</p>
+                                    <small class="text-muted">Los datos se procesarán y se agregarán a tu inventario.</small>
+
+                                    <div class="d-flex flex-column flex-lg-row align-items-start align-items-lg-center justify-content-between gap-3">
                                         <div class="d-flex align-items-center">
                                             <i class="bi bi-file-earmark-check fs-4 me-3"></i>
                                             <div>
-                                                <h6 class="mb-1" id="fileName">archivo.xlsx</h6>
-                                                <small id="fileDetails" class="text-muted">2.5 MB • Excel</small>
+                                                <h6 class="mb-1" id="fileName">2025_10_03_10_20_15_258889.xlsx</h6>
+                                                <small id="fileDetails" class="text-muted">13.22 kB • Excel</small>
                                             </div>
                                         </div>
-                                        <div>
-                                            <button class="btn btn-primary me-2" id="importBtn">
-                                                <i class="bi bi-upload me-2"></i>Importar
+                                        <div class="d-flex gap-2 flex-shrink-0">
+                                            <button class="btn btn-primary" id="modalConfirmBtn">
+                                                <i class="bi bi-upload me-2"></i>Sí, importar
                                             </button>
                                             <button class="btn btn-outline-secondary" id="cancelBtn">
                                                 <i class="bi bi-x-lg"></i>
@@ -67,7 +71,7 @@
 </div>
 
 
-<!-- Modal de confirmación -->
+<!-- Modal de confirmación 
 <div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -97,13 +101,15 @@
                 <button type="button" class="btn btn-secondary" id="modalCancelBtn">
                     <i class="bi bi-x-lg me-2"></i>Cancelar
                 </button>
-                <button type="button" class="btn btn-primary" id="modalConfirmBtn">
+                <button type="button" class="btn btn-primary" id="modalConfirmBtnEliminar">
                     <i class="bi bi-check-lg me-2"></i>Sí, importar
                 </button>
             </div>
         </div>
     </div>
 </div>
+-->
+
 
 <!-- Modal de progreso -->
 <div class="modal fade" id="progressModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -225,7 +231,6 @@
 
     // Referencias a modals
     const abrirImportModal = new bootstrap.Modal(document.getElementById('abrirImportModal'));
-    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     const progressModal = new bootstrap.Modal(document.getElementById('progressModal'));
     const resultsModal = new bootstrap.Modal(document.getElementById('resultsModal'));
     const errorModal = new bootstrap.Modal(document.getElementById('errorModal'));
@@ -239,7 +244,6 @@
         fileInfoAlert: document.getElementById('fileInfoAlert'),
         fileName: document.getElementById('fileName'),
         fileDetails: document.getElementById('fileDetails'),
-        importBtn: document.getElementById('importBtn'),
         cancelBtn: document.getElementById('cancelBtn'),
         modalFileName: document.getElementById('modalFileName'),
         modalFileSize: document.getElementById('modalFileSize'),
@@ -255,15 +259,12 @@
     function initializeEventListeners() {
         // Eventos de selección de archivo
         elements.selectBtn.addEventListener('click', () => elements.fileInput.click());
-        // elements.uploadZone.addEventListener('click', () => elements.fileInput.click());
         elements.fileInput.addEventListener('change', handleFileSelection);
 
         // Eventos de botones
         elements.abrirImport.addEventListener('click', showAbrirImportModal);
-        elements.importBtn.addEventListener('click', showConfirmModal);
         elements.cancelBtn.addEventListener('click', resetForm);
         elements.modalConfirmBtn.addEventListener('click', handleImportConfirmation);
-        elements.modalCancelBtn.addEventListener('click', () => confirmModal.hide());
 
         // Drag & Drop
         elements.uploadZone.addEventListener('dragover', handleDragOver);
@@ -348,21 +349,13 @@
         elements.fileInfoAlert.classList.remove('d-none');
         elements.fileInfoAlert.classList.add('fade-in');
     }
-
-    // Mostrar modal de confirmación
-    function showConfirmModal() {
-        if (!selectedFile) return;
-
-        elements.modalFileName.textContent = selectedFile.name;
-        elements.modalFileSize.textContent = formatFileSize(selectedFile.size);
-        confirmModal.show();
-    }
+        
 
     // Manejar confirmación de importación
     async function handleImportConfirmation() {
         if (!selectedFile) return;
 
-        confirmModal.hide();
+        abrirImportModal.hide();
 
         try {
             // Mostrar modal de progreso

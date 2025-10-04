@@ -63,8 +63,6 @@ namespace UI.WalletWeb.Controllers
 
                 }
 
-                // Aquí procesarías los datos según tu lógica de negocio
-                // Por ejemplo: guardar en base de datos, validar, etc.
 
                 return Json(new
                 {

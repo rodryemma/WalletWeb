@@ -390,7 +390,7 @@ namespace Infra.DataAccess.Repository
             {
                 try
                 {
-                    string sqlString = @"INSERT INTO ContabilidadPersonal (                                          
+                    string sqlString = @"INSERT IGNORE INTO ContabilidadPersonal (                                          
                                           Fecha,
                                           Cateria,
                                           Cuenta,
@@ -454,7 +454,7 @@ namespace Infra.DataAccess.Repository
                 try
                 {
                     var sql = new StringBuilder();
-                    sql.Append(@"INSERT INTO ContabilidadPersonal (                                          
+                    sql.Append(@"INSERT IGNORE INTO ContabilidadPersonal (                                          
                       Fecha,
                       Cateria,
                       Cuenta,

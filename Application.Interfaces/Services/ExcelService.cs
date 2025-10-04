@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
@@ -91,18 +92,18 @@ namespace Application.Services
             try
             {
                 //TODO : Cambiar en la busqueda por nombre que este el tipo de movimiento
-                var nombreCategoria = listExcel.Select(x => x.Categoria).Distinct().ToList();
-                var nombreCuentas = listExcel.Select(x => x.Cuenta).Distinct().ToList();
-                var nombreDivisa = listExcel.Select(x => x.Divisa).Distinct().ToList();
+                var nombreCategoria = listExcel.Select(x => x.Categoria.ToLower()).Distinct().ToList();
+                var nombreCuentas = listExcel.Select(x => x.Cuenta.ToLower()).Distinct().ToList();
+                var nombreDivisa = listExcel.Select(x => x.Divisa.ToLower()).Distinct().ToList();
                 var ListFechas = listExcel.Select(x => x.Fecha).Distinct().ToList();
 
                 var listCategoria = await _categoriaService.ObtenerMultiplesCategoriasAsyncService(nombreCategoria, tipo.ToLower());
                 var listCuentas = await _cuentaWalletService.ObtenerMultiplesCuentasAsyncService(nombreCuentas);
                 var listDivisas = await _divisaService.ObtenerMultiplesDivisasAsyncService(nombreDivisa);
 
-                var diccCategoria = listCategoria.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre, c => c.Id);
-                var diccCuentas = listCuentas.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre, c => c.Id);
-                var diccDivisas = listDivisas.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre, c => c.Id);
+                var diccCategoria = listCategoria.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre.ToLower(), c => c.Id);
+                var diccCuentas = listCuentas.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre.ToLower(), c => c.Id);
+                var diccDivisas = listDivisas.Data.DistinctBy(c => c.Nombre).ToDictionary(c => c.Nombre.ToLower(), c => c.Id);
                 var arrayFechas = await Task.WhenAll(ListFechas.Select(async fecha => new
                 {
                     Fecha = fecha,
@@ -118,9 +119,9 @@ namespace Application.Services
                     Comentario = x.Comentario,
                     TipoMovimiento = tipo,
                     ValorCCL = (diccFechas.ContainsKey(x.Fecha) ? diccFechas[x.Fecha] : 0),
-                    CategoriaId = (diccCategoria.ContainsKey(x.Categoria) ? diccCategoria[x.Categoria] : 0),
-                    DivisaId = (diccCuentas.ContainsKey(x.Divisa) ? diccCuentas[x.Divisa] : 0),
-                    CuentaWalletId = (diccCuentas.ContainsKey(x.Cuenta) ? diccCuentas[x.Cuenta] : 0)
+                    CategoriaId = (diccCategoria.ContainsKey(x.Categoria.ToLower()) ? diccCategoria[x.Categoria.ToLower()] : 30),
+                    DivisaId = (diccCuentas.ContainsKey(x.Divisa.ToLower()) ? diccCuentas[x.Divisa.ToLower()] : 2),
+                    CuentaWalletId = (diccCuentas.ContainsKey(x.Cuenta.ToLower()) ? diccCuentas[x.Cuenta.ToLower()] : 5)
                 }).ToList();
 
                 return OperationResult<List<Contabilidad>>.Ok(mapListExcel);
@@ -133,6 +134,11 @@ namespace Application.Services
 
         public async Task<OperationResult<int>> GuardarExcelContabilidad(List<ExcelContabilidad> listExcel, string tipo)
         {
+            if((listExcel?.Count ?? 0) == 0)
+            {
+                return OperationResult<int>.Ok(0, $"Sin elementos en: {tipo}");
+            }
+
             if (ValidationHelper.CompararEnum(tipo, ContabilidadTipoEnums.Gastos) || ValidationHelper.CompararEnum(tipo, ContabilidadTipoEnums.Ingresos))
             {
                 var mapContabilidad = await MapearExcelAContabilidad(listExcel, tipo);
