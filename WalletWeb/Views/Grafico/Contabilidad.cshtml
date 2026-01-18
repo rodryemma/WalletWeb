@@ -1,0 +1,170 @@
+﻿@{
+    ViewData["Title"] = "Gráfico de contabilidad";
+}
+
+<h2 class="mb-4 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h2>
+
+<div class="p-3 bg-white border rounded shadow-sm mb-4">
+    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
+
+    <div class="row g-3">
+
+        <div class="col-sm-6">
+            <div class="p-3 bg-light border rounded shadow-sm h-100">
+                <div class="text-muted small mb-2">Por movimiento</div>
+                <div class="mt-auto">
+                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
+                        <option value="total">Total</option>
+                        <option value="gastos">Gastos</option>
+                        <option value="ingresos">Ingresos</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="p-3 bg-light border rounded shadow-sm h-100">
+                <div class="text-muted small mb-2">Por fecha</div>
+                <div class="mt-auto">
+                    <label class="small fw-bold">Desde:</label>
+                    <input type="date" id="fechaDesde">
+                    <label class="small fw-bold">Hasta:</label>
+                    <input type="date" id="fechaHasta">
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+    <h2>Reporte de contabilidad</h2>
+
+    <div class="chart-container">
+        <canvas id="contabilidadChart"></canvas>
+    </div>
+</div>
+
+@section Styles {
+   @*  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css"> *@
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            cargarDateDesdeHasta();
+            cargarGraficoContabilidad();
+
+        });
+
+
+        // Región: Cargar Date Desde y Hasta
+        function cargarDateDesdeHasta(){
+            const hoy = new Date();
+            const fechaHasta = hoy.toISOString().split('T')[0];
+            const unMesAntes = new Date(hoy);
+
+            unMesAntes.setMonth(unMesAntes.getMonth() - 6);
+            unMesAntes.setDate(1);
+
+            const fechaDesde = unMesAntes.toISOString().split('T')[0];
+
+            document.getElementById('fechaDesde').value = fechaDesde;
+            document.getElementById('fechaHasta').value = fechaHasta;
+        }
+
+        //Recargar Chart por cambio fecha
+        $('#fechaDesde, #fechaHasta').on('change', function () {
+                cargarGraficoContabilidad();
+            });
+        //Recargar Chart por tipomovimiento
+        $('#tipoMovimientoSelect').change(function () {
+            cargarGraficoContabilidad();
+        });
+
+        //Recargar Chart por fecha desde anterior
+        let fechaInicial = new Date(document.getElementById('fechaDesde').value);
+
+        document.getElementById('fechaDesde').addEventListener('change', function () {
+            const nuevaFechaStr = this.value;
+            if (!nuevaFechaStr) return;
+
+            const nuevaFecha = new Date(nuevaFechaStr);
+
+            if (nuevaFecha < fechaInicial) {
+                fechaInicial = nuevaFecha;
+                cargarGraficoContabilidad();
+            }
+        });
+
+
+        let contabilidadChart = null;
+
+        async function cargarGraficoContabilidad() {
+
+            const tipoMovimiento = $('#tipoMovimientoSelect').val();
+            const fecha = $('#fechaDesde').val();
+            
+            const params = new URLSearchParams({
+                tipoMovimiento: tipoMovimiento,
+                fecha: fecha
+            });
+
+            try {
+                const url = `/reportes/contabilidad?${params}`
+                const response = await apiRequest(url);
+               
+                const result = response;
+
+                const datasets = result.series.map(s => ({
+                    label: s.label,
+                    data: s.data,
+                    borderWidth: 2,
+                    tension: 0.4
+                }));
+
+                const ctx = document.getElementById('contabilidadChart');
+                if (!ctx) return;
+
+                if (contabilidadChart) {
+                    contabilidadChart.destroy();
+                }
+
+                contabilidadChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: result.labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                          y: {
+                            beginAtZero: true
+                          }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+
+        function formatearFecha(fechaIso) {
+            const fecha = new Date(fechaIso);
+            return fecha.toLocaleDateString('es-AR', {
+                day: '2-digit',
+                month: '2-digit'
+            });
+        }
+    </script>
+}

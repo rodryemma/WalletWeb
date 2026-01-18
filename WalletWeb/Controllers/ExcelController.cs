@@ -50,12 +50,12 @@ namespace UI.WalletWeb.Controllers
 
                 if (responseGastos.Success)
                 {
-                    var rta = await _excelService.GuardarExcelContabilidad(responseGastos.Data, ContabilidadTipoEnums.Gastos.ToString());
+                    var rta = await _excelService.GuardarExcelContabilidad(responseGastos.Data, ContabilidadTipoEnums.Gastos.ToString().ToLower());
                 }
 
                 if (responseIngresos.Success)
                 {
-                    var rta = await _excelService.GuardarExcelContabilidad(responseIngresos.Data, ContabilidadTipoEnums.Ingresos.ToString());
+                    var rta = await _excelService.GuardarExcelContabilidad(responseIngresos.Data, ContabilidadTipoEnums.Ingresos.ToString().ToLower());
                 }
 
                 if (responseTransacciones.Success)
