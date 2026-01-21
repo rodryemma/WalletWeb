@@ -18,4 +18,17 @@ namespace Application.DTOs
         public List<ChartSerieDto> Series { get; set; } = new();
     }
 
+    public class ReporteCategoriaDto
+    {
+        public ChartResultDto Chart { get; set; }
+        public Dictionary<string, Dictionary<string, bool>> DiccionarioCategoria { get; set; }
+    }
+
+    public class ReporteFiltroCategoriaDto
+    {
+        public string TipoMovimiento { get; set; }
+        public string Fecha { get; set; }
+        public Dictionary<string, Dictionary<string, bool>> CategoriaFiltro { get; set; }
+    }
+
 }

@@ -47,6 +47,22 @@ namespace Application.Services
         {
             return _CategoriaRepository.InsertarCategoriaPersonalAsync(xCategoria);
         }
-        
+
+        public Dictionary<string, Dictionary<string, bool>> ArmarDiccionarioCategoriaService(OperationResult<List<Categoria>> categoria)
+        {
+            var diccionarioCategoria = new Dictionary<string, Dictionary<string, bool>>();
+
+            if (categoria.Success && categoria.Data != null)
+            {
+                diccionarioCategoria = categoria.Data
+                .GroupBy(c => c.Tipo)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.ToDictionary(c => c.Nombre, c => true)
+                );
+            }
+            return diccionarioCategoria;
+        }
+
     }
 }

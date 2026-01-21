@@ -16,5 +16,6 @@ namespace Application.Interfaces
         Task<OperationResult<int>> InsertarCategoriaPersonalAsyncService(Categoria xCategoria);
         Task<OperationResult<int>> EditarCategoriaPersonalAsyncService(Categoria xCategoria);
         Task<OperationResult<int>> EliminarCategoriaPersonalAsyncService(int xId);
+        Dictionary<string, Dictionary<string, bool>> ArmarDiccionarioCategoriaService(OperationResult<List<Categoria>> categoria);
     }
 }

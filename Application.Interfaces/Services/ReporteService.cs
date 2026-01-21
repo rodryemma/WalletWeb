@@ -12,12 +12,30 @@ namespace Application.Services
 {
     public class ReporteService : IReporteService
     {
-        public ChartResultDto ObtenerTransaccionesPorMes(OperationResult<List<ContabilidadDto>> list)
+        public ChartResultDto ObtenerTransaccionesMontoPorMes(OperationResult<List<ContabilidadDto>> list, Dictionary<string, Dictionary<string, bool>> categoriaFiltro)
         {
             var data = list.Data;
 
-            // 1. Agrupación base: Año + Mes + TipoMovimiento
-            var agrupado = data
+            // . Filtrar según categoriaFiltro (solo si no es null)
+            var dataFiltrada = categoriaFiltro == null || categoriaFiltro.Count == 0
+                ? data
+                : data.Where(x => {
+                    var tipoMov = x.TipoMovimiento ?? "Sin tipo";
+
+                    // Si no existe el tipo en el filtro, no incluir
+                    if (!categoriaFiltro.ContainsKey(tipoMov))
+                        return false;
+
+                    var subcategorias = categoriaFiltro[tipoMov];
+
+                    // Si la subcategoría del registro está en true, incluir
+                    return subcategorias.ContainsKey(x.Categoria) && subcategorias[x.Categoria];
+                }).ToList();
+
+
+
+            // . Agrupación base: Año + Mes + TipoMovimiento
+            var agrupado = dataFiltrada
                 .GroupBy(x => new
                 {
                     x.Fecha.Year,
@@ -33,7 +51,7 @@ namespace Application.Services
                 })
                 .ToList();
 
-            // 2. Meses ordenados
+            // . Meses ordenados
             var meses = agrupado
                 .Select(x => new { x.Year, x.Month })
                 .Distinct()
@@ -41,7 +59,7 @@ namespace Application.Services
                 .ThenBy(x => x.Month)
                 .ToList();
 
-            // 3. Labels de meses
+            // . Labels de meses
             var labels = meses
                 .Select(m => new DateTime(m.Year, m.Month, 1)
                     .ToString("MMM yyyy", CultureInfo.GetCultureInfo("es-AR")))
@@ -54,7 +72,7 @@ namespace Application.Services
                 { "gastos", 2 }
             };
 
-            // 4. Series por tipo de movimiento
+            // . Series por tipo de movimiento
             var series = agrupado
                 .Select(x => x.TipoMovimiento)
                 .Distinct()
