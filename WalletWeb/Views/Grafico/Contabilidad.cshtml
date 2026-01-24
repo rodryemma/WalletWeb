@@ -4,28 +4,26 @@
     var diccionario = null as Dictionary<string, Dictionary<string, bool>>;
 }
 
-<h2 class="mb-4 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h2>
+<h4 class="mb-2 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h4>
 
 <div class="p-3 bg-white border rounded shadow-sm mb-4">
-    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
+    <h6 class="mb-3 fw-semibold text-secondary">Filtrar</h6>
 
     <div class="row g-3">
 
         <div class="col-sm-3">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por movimiento</div>
-                <div class="mt-auto">
-                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
+                <span class="text-muted small">Por movimiento</span>
+                    <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
                         <option value="total">Total</option>
                         <option value="gastos">Gastos</option>
                         <option value="ingresos">Ingresos</option>
                     </select>
-                </div>
             </div>
         </div>
 
         <div class="col-sm-3">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
                 <div class="text-muted small mb-2">Por categoría</div>
                 <div class="mt-auto">    
                     <button class="btn-crear btn btn-sm btn-outline-primary w-auto d-inline-block ms-2"
@@ -37,14 +35,12 @@
         </div>
 
         <div class="col-sm-6">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por fecha</div>
-                <div class="mt-auto">
-                    <label class="small fw-bold">Desde:</label>
-                    <input type="date" id="fechaDesde">
-                    <label class="small fw-bold">Hasta:</label>
-                    <input type="date" id="fechaHasta">
-                </div>
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center flex-wrap gap-2">
+                <div class="text-muted small">Por fecha</div>
+                <label class="small fw-bold mb-0">Desde:</label>
+                <input type="date" id="fechaDesde" class="form-control form-control-sm w-auto">
+                <label class="small fw-bold mb-0">Hasta:</label>
+                <input type="date" id="fechaHasta" class="form-control form-control-sm w-auto">
             </div>
         </div>
 
@@ -53,7 +49,7 @@
 </div>
 
 <div class="container">
-    <h2>Reporte de contabilidad</h2>
+    <h5 class="fw-semibold text-secondary">Reporte de contabilidad</h5>
 
     <div class="chart-container">
         <canvas id="contabilidadChart"></canvas>

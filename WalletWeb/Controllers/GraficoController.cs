@@ -19,7 +19,7 @@ namespace UI.WalletWeb.Controllers
             _categoriaService = categoriaService;
         }
 
-        [HttpGet]
+        [HttpGet("Contabilidad/Grafico/Barra")]
         public IActionResult Contabilidad()
         {
             return View();

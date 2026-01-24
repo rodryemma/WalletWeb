@@ -1,51 +1,48 @@
 ﻿@{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Transacciones";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2 class="mb-4 pb-2 fw-semibold text-secondary">Transacciones</h2>
+<h4 class="mb-2 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h4>
+
 
 <div class="d-flex gap-3 mb-4">
 
-    <div class="p-3 bg-light border rounded shadow-sm flex-fill text-center">
-        <div class="text-muted small">Total en USD</div>
-        <div class="h5 fw-bold" id="totalMonto">0.00</div>
+    <div class="p-2 bg-light border rounded shadow-sm flex-fill">
+        <span class="text-muted small">Total en USD</span>
+        <span class="h6 fw-bold ms-2" id="totalMonto">2278.19</span>
     </div>
 
-    <div class="p-3 bg-light border rounded shadow-sm flex-fill text-center">
-        <div class="text-muted small">Dólar CCL</div>
-        <div class="h5 fw-bold" id="valorDolar">0.00</div>
+    <div class="p-2 bg-light border rounded shadow-sm flex-fill">
+        <span class="text-muted small">Dólar CCL</span>
+        <span class="h6 fw-bold ms-2" id="valorDolar">1506,32</span>
     </div>
 
 </div>
 
 <div class="p-3 bg-white border rounded shadow-sm mb-4">
-    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
+    <h6 class="mb-3 fw-semibold text-secondary">Filtrar</h6>
 
     <div class="row g-3">
 
         <div class="col-sm-6">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por movimiento</div>
-                <div class="mt-auto">
-                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
+                <span class="text-muted small">Por movimiento</span>
+                <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
                         <option value="total">Total</option>
                         <option value="gastos">Gastos</option>
                         <option value="ingresos">Ingresos</option>
                     </select>
-                </div>
             </div>
         </div>
 
         <div class="col-sm-6">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por fecha</div>
-                <div class="mt-auto">
-                    <label class="small fw-bold">Desde:</label>
-                    <input type="date" id="fechaDesde">
-                    <label class="small fw-bold">Hasta:</label>
-                    <input type="date" id="fechaHasta">
-                </div>
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center flex-wrap gap-2">
+                <div class="text-muted small">Por fecha</div>
+                <label class="small fw-bold mb-0">Desde:</label>
+                <input type="date" id="fechaDesde" class="form-control form-control-sm w-auto">
+                <label class="small fw-bold mb-0">Hasta:</label>
+                <input type="date" id="fechaHasta" class="form-control form-control-sm w-auto">
             </div>
         </div>
 
@@ -54,8 +51,8 @@
 </div>
 
 
-<div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-    <h4 class="fw-semibold text-secondary">Lista de Transacciones</h4>
+<div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+    <h5 class="fw-semibold text-secondary">Lista de Transacciones</h5>
     <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
         <i class="bi bi-plus"></i> Agregar
     </button>
@@ -295,6 +292,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="~/js/_ImportadorModal.js"></script>
 
     <script>
 

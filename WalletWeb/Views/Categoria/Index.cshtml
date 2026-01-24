@@ -2,23 +2,21 @@
     ViewData["Title"] = "Categoría";
 }
 
-<h2 class="mb-4 pb-2 fw-semibold text-secondary">Categoria</h2>
+<h4 class="mb-2 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h4>
 
 <div class="p-3 bg-white border rounded shadow-sm mb-4">
-    <h5 class="mb-3 fw-semibold text-secondary">Filtrar</h5>
+    <h6 class="mb-3 fw-semibold text-secondary">Filtrar</h6>
 
     <div class="row g-3">
 
         <div class="col-sm-12">
-            <div class="p-3 bg-light border rounded shadow-sm h-100">
-                <div class="text-muted small mb-2">Por movimiento</div>
-                <div class="mt-auto">
-                    <select id="tipoMovimientoSelect" class="form-select w-auto d-inline-block ms-2">
-                        <option value="total">Total</option>
-                        <option value="gastos">Gastos</option>
-                        <option value="ingresos">Ingresos</option>
-                    </select>
-                </div>
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
+                <span class="text-muted small">Por movimiento</span>
+                <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
+                    <option value="total">Total</option>
+                    <option value="gastos">Gastos</option>
+                    <option value="ingresos">Ingresos</option>
+                </select>
             </div>
         </div>
 
@@ -26,8 +24,8 @@
 
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3 mt-5">
-    <h4 class="fw-semibold text-secondary">Lista de Categoria</h4>
+<div class="d-flex justify-content-between align-items-center mb-3 mt-4">
+    <h5 class="fw-semibold text-secondary">Lista de Transacciones</h5>
     <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
         <i class="bi bi-plus"></i> Agregar
     </button>
