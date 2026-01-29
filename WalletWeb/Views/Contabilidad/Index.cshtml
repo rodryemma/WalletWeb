@@ -29,10 +29,10 @@
             <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
                 <span class="text-muted small">Por movimiento</span>
                 <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
-                        <option value="total">Total</option>
-                        <option value="gastos">Gastos</option>
-                        <option value="ingresos">Ingresos</option>
-                    </select>
+                    <option value="total">Total</option>
+                    <option value="gastos">Gastos</option>
+                    <option value="ingresos">Ingresos</option>
+                </select>
             </div>
         </div>
 
@@ -53,9 +53,21 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3 mt-4">
     <h5 class="fw-semibold text-secondary">Lista de Transacciones</h5>
-    <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
-        <i class="bi bi-plus"></i> Agregar
-    </button>
+    <div class="d-flex gap-2">
+        <div class="dropdown">
+            <button class="btn btn-sm btn-outline-success dropdown-toggle" type="button" id="graficosButton" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-chevron-compact-down"></i> Gráficos
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownGraficosButton">
+                <li><a class="dropdown-item" href="/contabilidad/grafico/barra">Barra</a></li>
+                <li><a class="dropdown-item" href="/contabilidad/grafico/torta">Torta</a></li>
+            </ul>
+        </div>
+
+        <button class="btn-crear btn btn-sm btn-outline-primary" id="btn-crear">
+            <i class="bi bi-plus"></i> Agregar
+        </button>
+    </div>
 </div>
 
 
@@ -695,7 +707,7 @@
                 }
 
             });
-        }             
+        }
 
 
     </script>

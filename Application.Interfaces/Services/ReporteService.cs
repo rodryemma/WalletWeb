@@ -1,10 +1,12 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
+using Domain.Model.Enums;
 using Shared;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,18 +14,21 @@ namespace Application.Services
 {
     public class ReporteService : IReporteService
     {
-        public ChartResultDto ObtenerTransaccionesMontoPorMes(OperationResult<List<ContabilidadDto>> list, Dictionary<string, Dictionary<string, bool>> categoriaFiltro)
+        public ChartResultDto ObtenerTransaccionesMontoPorMes(OperationResult<List<ContabilidadDto>> list, ReporteFiltroCategoriaDto reporteFiltroCategoriaDto)
         {
             var data = list.Data;
-
+            var categoriaFiltro = reporteFiltroCategoriaDto.CategoriaFiltro;
+            var fechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
             // . Filtrar según categoriaFiltro (solo si no es null)
             var dataFiltrada = categoriaFiltro == null || categoriaFiltro.Count == 0
                 ? data
-                : data.Where(x => {
+                : data.Where(x =>
+                {
                     var tipoMov = x.TipoMovimiento ?? "Sin tipo";
+                    var fechaList = x.Fecha;
 
                     // Si no existe el tipo en el filtro, no incluir
-                    if (!categoriaFiltro.ContainsKey(tipoMov))
+                    if (!categoriaFiltro.ContainsKey(tipoMov) || fechaList > fechaHasta)
                         return false;
 
                     var subcategorias = categoriaFiltro[tipoMov];
@@ -68,8 +73,8 @@ namespace Application.Services
             //Le damos un orden a cual mostrar primero en las barras
             var ordenTipoMovimiento = new Dictionary<string, int>
             {
-                { "ingresos", 1 },
-                { "gastos", 2 }
+                { ContabilidadTipoEnums.Ingresos.ToString().ToLower(), 1 },
+                { ContabilidadTipoEnums.Gastos.ToString().ToLower(), 2 }
             };
 
             // . Series por tipo de movimiento
@@ -93,6 +98,65 @@ namespace Application.Services
                     ).ToList()
                 })
                 .ToList();
+
+            return new ChartResultDto
+            {
+                Labels = labels,
+                Series = series
+            };
+        }
+
+        public ChartResultDto ObtenerTransaccionesMontoPorCategoria(OperationResult<List<ContabilidadDto>> list, ReporteFiltroCategoriaDto reporteFiltroCategoriaDto)
+        {
+            var data = list.Data;
+            var categoriaFiltro = reporteFiltroCategoriaDto.CategoriaFiltro;
+            var fechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
+            // . Filtrar según categoriaFiltro (solo si no es null)
+            var dataFiltrada = categoriaFiltro == null || categoriaFiltro.Count == 0
+                ? data
+                : data.Where(x =>
+                {
+                    var tipoMov = x.TipoMovimiento ?? "Sin tipo";
+                    var fechaList = x.Fecha;
+
+                    // Si no existe el tipo en el filtro, no incluir
+                    if (!categoriaFiltro.ContainsKey(tipoMov) || fechaList > fechaHasta)
+                        return false;
+
+                    var subcategorias = categoriaFiltro[tipoMov];
+
+                    // Si la subcategoría del registro está en true, incluir
+                    return subcategorias.ContainsKey(x.Categoria) && subcategorias[x.Categoria];
+                }).ToList();
+
+            var agrupado = dataFiltrada
+                .GroupBy(x => new
+                {
+                    x.Categoria
+                })
+                .Select(g => new
+                {
+                    Categoria = g.Key.Categoria ?? "Sin tipo",
+                    Total = Math.Round(g.Sum(x => x.MontoUsd), 2)
+                })
+                .OrderByDescending(x => x.Total)
+                .ToList();
+
+            var labels = agrupado
+                .Select(m => m.Categoria)
+                .ToList();
+
+            var serieData = agrupado
+                .Select(m => m.Total)
+                .ToList();
+
+            var series = new List<ChartSerieDto>();
+
+            series.Add(new ChartSerieDto
+                {
+                    Data = serieData
+                }
+            );
 
             return new ChartResultDto
             {

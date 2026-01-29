@@ -14,7 +14,7 @@ namespace Application.DTOs
 
     public class ChartResultDto
     {
-        public List<string> Labels { get; set; } = new(); // Meses
+        public List<string> Labels { get; set; } = new(); 
         public List<ChartSerieDto> Series { get; set; } = new();
     }
 
@@ -27,7 +27,8 @@ namespace Application.DTOs
     public class ReporteFiltroCategoriaDto
     {
         public string TipoMovimiento { get; set; }
-        public string Fecha { get; set; }
+        public string FechaDesde { get; set; }
+        public string FechaHasta { get; set; }
         public Dictionary<string, Dictionary<string, bool>> CategoriaFiltro { get; set; }
     }
 

@@ -10,6 +10,7 @@ namespace Domain.Model.Enums
     {
         Gastos,
         Ingresos,
-        Transferencias
+        Transferencias,
+        Total
     }
 }

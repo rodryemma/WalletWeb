@@ -28,7 +28,7 @@
                 <div class="mt-auto">    
                     <button class="btn-crear btn btn-sm btn-outline-primary w-auto d-inline-block ms-2"
                             id="btn-CategoriaSelect">
-                        <i class="bi bi-check2-square"></i> Seleccionar categorias
+                        <i class="bi bi-check2-square"></i> Seleccionar
                     </button>
                 </div>
             </div>
@@ -99,7 +99,6 @@
 
 
 @section Styles {
-   @*  <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.dataTables.min.css"> *@
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 }
 
@@ -166,12 +165,36 @@
         async function cargarGraficoContabilidad() {
 
             const tipoMovimiento = $('#tipoMovimientoSelect').val();
-            const fecha = $('#fechaDesde').val();
+            const fechaDesde = $('#fechaDesde').val();
+            const fechaHasta = $('#fechaHasta').val();
+
             
             const data = {
                     TipoMovimiento: tipoMovimiento,
-                    Fecha: fecha,
+                    FechaDesde: fechaDesde,
+                    FechaHasta: fechaHasta,
                     CategoriaFiltro: diccionarioCategoriaGlobal
+            };
+
+            const colorConfig = {
+                        total: {
+                            'ingresos': {
+                                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                                borderColor: 'rgb(54, 162, 235)'
+                            },
+                            'gastos': {
+                                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                                borderColor: 'rgb(255, 99, 132)'
+                            }
+                        },
+                        gastos: {
+                            backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+                            borderColor: ['rgb(255, 99, 132)']
+                        },
+                        ingresos: {
+                            backgroundColor: ['rgba(54, 162, 235, 0.2)'],
+                            borderColor: ['rgb(54, 162, 235)']
+                        }
             };
 
             try  {
@@ -181,12 +204,26 @@
 
                     const result = response.chart;
 
-                    const datasets = result.series.map(s => ({
-                        label: s.label,
-                        data: s.data,
-                        borderWidth: 2,
-                        tension: 0.4
-                    }));
+                    const datasets = result.series.map(s => {
+                        let colors;
+
+                        if (tipoMovimiento === 'total') {
+                            colors = colorConfig.total[s.label.toLowerCase()] || colorConfig.total['ingresos'];
+                        } else {
+                            colors = colorConfig[tipoMovimiento];
+                        }
+
+                        return {
+                            label: s.label,
+                            data: s.data,
+                            backgroundColor: colors.backgroundColor,
+                            borderColor: colors.borderColor,
+                            borderWidth: 2,
+                            tension: 0.4
+                        };
+                    });
+
+                    
 
                     const ctx = document.getElementById('contabilidadChart');
                     if (!ctx) return;

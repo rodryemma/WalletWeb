@@ -10,6 +10,8 @@ namespace Application.Interfaces
 {
     public interface IReporteService
     {
-        ChartResultDto ObtenerTransaccionesMontoPorMes(OperationResult<List<ContabilidadDto>> list, Dictionary<string, Dictionary<string, bool>> categoriaFiltro);
+        ChartResultDto ObtenerTransaccionesMontoPorMes(OperationResult<List<ContabilidadDto>> list, ReporteFiltroCategoriaDto reporteFiltroCategoriaDto);
+        ChartResultDto ObtenerTransaccionesMontoPorCategoria(OperationResult<List<ContabilidadDto>> list, ReporteFiltroCategoriaDto reporteFiltroCategoriaDto);
+
     }
 }

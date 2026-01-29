@@ -1,9 +1,11 @@
 ﻿using Domain.Model.Entites;
 using Domain.Model.Entity;
+using Domain.Model.Enums;
 using Domain.Model.Interfaces;
 using Microsoft.Extensions.Configuration;
 using MySqlConnector;
 using Shared;
+using Shared.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,10 +36,10 @@ namespace Infra.DataAccess.Repositories
                     var whereClause = "";
                     var parametros = new List<MySqlParameter>();
 
-                    if (!string.Equals(xTipo, "total", StringComparison.OrdinalIgnoreCase))
+                    if (!string.Equals(xTipo, ContabilidadTipoEnums.Total.ToLowerString(), StringComparison.OrdinalIgnoreCase))
                     {
                         whereClause = " WHERE Tipo = @Tipo ";
-                        parametros.Add(new MySqlParameter("@Tipo", xTipo.ToLower()));
+                        parametros.Add(new MySqlParameter("@Tipo", xTipo));
                     }
 
                     var sqlString = $"{baseSql}{whereClause} ORDER BY Nombre DESC";

@@ -1,0 +1,228 @@
+﻿@using Newtonsoft.Json
+@{
+    ViewData["Title"] = "Gráfico de contabilidad torta";
+}
+
+<h4 class="mb-2 pb-2 fw-semibold text-secondary">@ViewData["Title"]</h4>
+
+<div class="p-3 bg-white border rounded shadow-sm mb-4">
+    <h6 class="mb-3 fw-semibold text-secondary">Filtrar</h6>
+
+    <div class="row g-3">
+
+        <div class="col-sm-3">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
+                <span class="text-muted small">Por movimiento</span>
+                <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
+                    <option value="gastos">Gastos</option>
+                    <option value="ingresos">Ingresos</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
+                <div class="text-muted small mb-2">Por categoría</div>
+                <div class="mt-auto">
+                    <button class="btn-crear btn btn-sm btn-outline-primary w-auto d-inline-block ms-2"
+                            id="btn-CategoriaSelect">
+                        <i class="bi bi-check2-square"></i> Seleccionar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center flex-wrap gap-2">
+                <div class="text-muted small">Por fecha</div>
+                <label class="small fw-bold mb-0">Desde:</label>
+                <input type="date" id="fechaDesde" class="form-control form-control-sm w-auto">
+                <label class="small fw-bold mb-0">Hasta:</label>
+                <input type="date" id="fechaHasta" class="form-control form-control-sm w-auto">
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="container">
+    <h5 class="fw-semibold text-secondary">Reporte de contabilidad</h5>
+
+    <div class="chart-container" style="height: 500px; width: 100%;">
+        <canvas id="contabilidadChartTorta"></canvas>
+    </div>
+</div>
+
+@section Styles {
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+}
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+
+
+        document.addEventListener("DOMContentLoaded", async () => {
+                cargarDateDesdeHasta();
+                cargarGraficoContabilidadPie();
+
+                // cargarModalConDiccionario(diccionarioCategoriaGlobal);
+            });
+
+
+            // Región: Cargar Date Desde y Hasta
+            function cargarDateDesdeHasta(){
+                const hoy = new Date();
+                const fechaHasta = hoy.toISOString().split('T')[0];
+                const unMesAntes = new Date(hoy);
+
+                unMesAntes.setMonth(unMesAntes.getMonth() - 6);
+                unMesAntes.setDate(1);
+
+                const fechaDesde = unMesAntes.toISOString().split('T')[0];
+
+                document.getElementById('fechaDesde').value = fechaDesde;
+                document.getElementById('fechaHasta').value = fechaHasta;
+            }
+
+            //Recargar Chart por cambio fecha
+            $('#fechaDesde, #fechaHasta').on('change', function () {
+                    cargarGraficoContabilidadPie();
+                });
+
+            //Recargar Chart por tipomovimiento
+            $('#tipoMovimientoSelect').change(function () {
+                cargarGraficoContabilidadPie();
+            });
+
+            //Recargar Chart por fecha desde anterior
+            let fechaInicial = new Date(document.getElementById('fechaDesde').value);
+
+            document.getElementById('fechaDesde').addEventListener('change', function () {
+                const nuevaFechaStr = this.value;
+                if (!nuevaFechaStr) return;
+
+                const nuevaFecha = new Date(nuevaFechaStr);
+
+                if (nuevaFecha < fechaInicial) {
+                    fechaInicial = nuevaFecha;
+                    cargarGraficoContabilidadPie();
+                }
+            });
+
+
+            let contabilidadChart = null;
+            // Diccionario global que se mantiene en la vista
+            var diccionarioCategoriaGlobal = {};
+
+            async function cargarGraficoContabilidadPie() {
+
+                const tipoMovimiento = $('#tipoMovimientoSelect').val();
+                const fechaDesde = $('#fechaDesde').val();
+                const fechaHasta = $('#fechaHasta').val();
+
+
+                const data = {
+                        TipoMovimiento: tipoMovimiento,
+                        FechaDesde: fechaDesde,
+                        FechaHasta: fechaHasta,
+                        CategoriaFiltro: diccionarioCategoriaGlobal
+                };
+
+                try  {
+                        const url = `/reportes/contabilidad/torta`
+                        const response = await apiRequest(url, "POST", data);
+                        diccionarioCategoriaGlobal = response.diccionarioCategoria;
+
+                        const result = response.chart;
+
+                        const datasets = result.series.map(s => {
+                            
+                            return {
+                                label: s.label,
+                                data: s.data
+                            };
+                        });
+
+
+
+                        const ctx = document.getElementById('contabilidadChartTorta');
+                        if (!ctx) return;
+
+                        if (contabilidadChart) {
+                            contabilidadChart.destroy();
+                        }
+
+                        contabilidadChart = new Chart(ctx, {
+                            type: 'pie',
+                            data: {
+                                labels: result.labels,
+                                datasets: datasets
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false, 
+                                layout: {
+                                    padding: {
+                                        left: 20,
+                                        right: 20,
+                                        top: 20,
+                                        bottom: 20
+                                    }
+                                },
+                                plugins: {
+                                   legend: {
+                                       position: 'right',
+                                       labels: {
+                                           boxWidth: 12,
+                                           boxHeight: 15,
+                                           padding: 12,
+                                           font: {
+                                               size: 13,
+                                               family: 'Arial',
+                                               weight: 'normal'
+                                           },
+                                           generateLabels: function(chart) {
+                                               const data = chart.data;
+                                               if (data.labels.length && data.datasets.length) {
+                                                   return data.labels.map((label, i) => {
+                                                       const value = data.datasets[0].data[i];
+                                                       return {
+                                                           text: `${label} (${value})`,
+                                                           fillStyle: data.datasets[0].backgroundColor[i],
+                                                           hidden: false,
+                                                           index: i
+                                                       };
+                                                   });
+                                               }
+                                               return [];
+                                           }
+                                       }
+                                   }
+                                }                       
+                            }
+                        });
+
+                    } catch(error) {
+                         console.error('Error al guardar:', error);
+                    } finally {
+
+                    }
+            }
+
+
+            function formatearFecha(fechaIso) {
+                const fecha = new Date(fechaIso);
+                return fecha.toLocaleDateString('es-AR', {
+                    day: '2-digit',
+                    month: '2-digit'
+                });
+            }
+
+
+    </script>
+
+}

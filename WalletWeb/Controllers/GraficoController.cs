@@ -1,8 +1,10 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
 using DocumentFormat.OpenXml.Vml;
+using Domain.Model.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
+using Shared.Extensions;
 
 namespace UI.WalletWeb.Controllers
 {
@@ -20,13 +22,12 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpGet("Contabilidad/Grafico/Barra")]
-        public IActionResult Contabilidad()
+        public IActionResult ContabilidadBar()
         {
             return View();
         }
 
-        //[HttpGet("reportes/contabilidad/barra
-        [HttpPost("reportes/contabilidad/barra")]        
+        [HttpPost("Reportes/Contabilidad/Barra")]        
         public async Task<IActionResult> GetTransacciones([FromBody] ReporteFiltroCategoriaDto reporteFiltroCategoriaDto)
         {
             if (reporteFiltroCategoriaDto == null)
@@ -34,11 +35,11 @@ namespace UI.WalletWeb.Controllers
                 return BadRequest("El reporte de filtro de categoria enviado es nula.");
             }
 
-            var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.Fecha);
+            var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
             var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
 
-            var categoria = await _categoriaService.ObtenerCategoriaDBFullAsyncService("total");
+            var categoria = await _categoriaService.ObtenerCategoriaDBFullAsyncService(ContabilidadTipoEnums.Total.ToLowerString());
 
             Dictionary<string, Dictionary<string, bool>> diccionarioCategoria;
 
@@ -51,11 +52,37 @@ namespace UI.WalletWeb.Controllers
                 diccionarioCategoria = reporteFiltroCategoriaDto.CategoriaFiltro;
             }
 
-            ChartResultDto result = _reporteService.ObtenerTransaccionesMontoPorMes(transacciones, reporteFiltroCategoriaDto.CategoriaFiltro);
+            ChartResultDto result = _reporteService.ObtenerTransaccionesMontoPorMes(transacciones, reporteFiltroCategoriaDto);
             ReporteCategoriaDto response = new ReporteCategoriaDto
             {
                 Chart = result,
                 DiccionarioCategoria = diccionarioCategoria
+            };
+            return Json(response);
+        }
+
+        [HttpGet("Contabilidad/Grafico/Torta")]
+        public IActionResult ContabilidadPie()
+        {
+            return View();
+        }
+
+        [HttpPost("Reportes/Contabilidad/Torta")]
+        public async Task<IActionResult> GetTransaccionesPie([FromBody] ReporteFiltroCategoriaDto reporteFiltroCategoriaDto)
+        {
+            if (reporteFiltroCategoriaDto == null)
+            {
+                return BadRequest("El reporte de filtro de categoria enviado es nula.");
+            }
+
+            var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
+            if (!transacciones.Success) { return BadRequest(transacciones.Message); }
+
+            ChartResultDto result = _reporteService.ObtenerTransaccionesMontoPorCategoria(transacciones, reporteFiltroCategoriaDto);
+            ReporteCategoriaDto response = new ReporteCategoriaDto
+            {
+                Chart = result
             };
             return Json(response);
         }
