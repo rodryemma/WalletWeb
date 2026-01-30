@@ -35,8 +35,12 @@ namespace UI.WalletWeb.Controllers
                 return BadRequest("El reporte de filtro de categoria enviado es nula.");
             }
 
-            var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
-            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
+            var FechaDesde = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
+            var FechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta);
+
+            //var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
+            //var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
 
             var categoria = await _categoriaService.ObtenerCategoriaDBFullAsyncService(ContabilidadTipoEnums.Total.ToLowerString());
@@ -75,8 +79,10 @@ namespace UI.WalletWeb.Controllers
                 return BadRequest("El reporte de filtro de categoria enviado es nula.");
             }
 
-            var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
-            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
+            var FechaDesde = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
+            var FechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
+
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
 
             ChartResultDto result = _reporteService.ObtenerTransaccionesMontoPorCategoria(transacciones, reporteFiltroCategoriaDto);

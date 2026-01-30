@@ -10,25 +10,13 @@
 
     <div class="row g-3">
 
-        <div class="col-sm-3">
+        <div class="col-sm-6">
             <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
                 <span class="text-muted small">Por movimiento</span>
                 <select id="tipoMovimientoSelect" class="form-select form-select-sm w-auto ms-2">
                     <option value="gastos">Gastos</option>
                     <option value="ingresos">Ingresos</option>
                 </select>
-            </div>
-        </div>
-
-        <div class="col-sm-3">
-            <div class="p-2 bg-light border rounded shadow-sm d-flex align-items-center">
-                <div class="text-muted small mb-2">Por categoría</div>
-                <div class="mt-auto">
-                    <button class="btn-crear btn btn-sm btn-outline-primary w-auto d-inline-block ms-2"
-                            id="btn-CategoriaSelect">
-                        <i class="bi bi-check2-square"></i> Seleccionar
-                    </button>
-                </div>
             </div>
         </div>
 
@@ -48,6 +36,14 @@
 
 <div class="container">
     <h5 class="fw-semibold text-secondary">Reporte de contabilidad</h5>
+
+    <div class="mb-3 d-flex align-items-center gap-2">
+        <label for="chartType" class="form-label mb-0 small">Tipo:</label>
+        <select class="form-select form-select-sm" id="chartType" name="chartType" style="width: auto;">
+            <option value="pie" selected>Torta</option>
+            <option value="doughnut">Dona</option>
+        </select>
+    </div>
 
     <div class="chart-container" style="height: 500px; width: 100%;">
         <canvas id="contabilidadChartTorta"></canvas>
@@ -72,7 +68,9 @@
                 // cargarModalConDiccionario(diccionarioCategoriaGlobal);
             });
 
-
+        document.getElementById('chartType').addEventListener('change', function() {
+            cargarGraficoContabilidadPie();
+        });
             // Región: Cargar Date Desde y Hasta
             function cargarDateDesdeHasta(){
                 const hoy = new Date();
@@ -120,6 +118,7 @@
 
             async function cargarGraficoContabilidadPie() {
 
+                const chartTypeSelect = document.getElementById('chartType').value;
                 const tipoMovimiento = $('#tipoMovimientoSelect').val();
                 const fechaDesde = $('#fechaDesde').val();
                 const fechaHasta = $('#fechaHasta').val();
@@ -140,7 +139,7 @@
                         const result = response.chart;
 
                         const datasets = result.series.map(s => {
-                            
+
                             return {
                                 label: s.label,
                                 data: s.data
@@ -157,14 +156,14 @@
                         }
 
                         contabilidadChart = new Chart(ctx, {
-                            type: 'pie',
+                            type: chartTypeSelect,
                             data: {
                                 labels: result.labels,
                                 datasets: datasets
                             },
                             options: {
                                 responsive: true,
-                                maintainAspectRatio: false, 
+                                maintainAspectRatio: false,
                                 layout: {
                                     padding: {
                                         left: 20,
@@ -202,7 +201,7 @@
                                            }
                                        }
                                    }
-                                }                       
+                                }
                             }
                         });
 

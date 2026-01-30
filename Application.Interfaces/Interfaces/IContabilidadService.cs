@@ -16,6 +16,7 @@ namespace Application.Interfaces
         Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo);
         Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadDBFullAsyncService(string xTipo, DateTime xFechaDesde);
         Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadJoinDBFullAsyncService(string xTipo, DateTime xFechaDesde);
+        Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadJoinDBFullAsyncService(string xTipo, DateTime xFechaDesde, DateTime xFechaHasta);
         DataTable ObtenerContabilidadDBFullService();
         Task<int> InsertarContabilidadPersonalAsyncService(Contabilidad xContabilidad, string xValorCCL);
         Task<OperationResult<int>> EditarContabilidadPersonalAsyncService(Contabilidad xContabilidad);

@@ -51,6 +51,14 @@
 <div class="container">
     <h5 class="fw-semibold text-secondary">Reporte de contabilidad</h5>
 
+    <div class="mb-3 d-flex align-items-center gap-2">
+        <label for="chartType" class="form-label mb-0 small">Tipo:</label>
+        <select class="form-select form-select-sm" id="chartType" name="chartType" style="width: auto;">
+            <option value="line" selected>Line</option>
+            <option value="bar">Bar</option>
+        </select>
+    </div>
+
     <div class="chart-container">
         <canvas id="contabilidadChart"></canvas>
     </div>
@@ -115,22 +123,7 @@
             cargarModalConDiccionario(diccionarioCategoriaGlobal);
             aplicarCambios()
         });
-
-
-        // Región: Cargar Date Desde y Hasta
-        function cargarDateDesdeHasta(){
-            const hoy = new Date();
-            const fechaHasta = hoy.toISOString().split('T')[0];
-            const unMesAntes = new Date(hoy);
-
-            unMesAntes.setMonth(unMesAntes.getMonth() - 6);
-            unMesAntes.setDate(1);
-
-            const fechaDesde = unMesAntes.toISOString().split('T')[0];
-
-            document.getElementById('fechaDesde').value = fechaDesde;
-            document.getElementById('fechaHasta').value = fechaHasta;
-        }
+                      
 
         //Recargar Chart por cambio fecha
         $('#fechaDesde, #fechaHasta').on('change', function () {
@@ -157,6 +150,9 @@
             }
         });
 
+        document.getElementById('chartType').addEventListener('change', function() {
+            cargarGraficoContabilidad();
+        });
 
         let contabilidadChart = null;
         // Diccionario global que se mantiene en la vista
@@ -164,6 +160,7 @@
 
         async function cargarGraficoContabilidad() {
 
+            const chartTypeSelect = document.getElementById('chartType').value;
             const tipoMovimiento = $('#tipoMovimientoSelect').val();
             const fechaDesde = $('#fechaDesde').val();
             const fechaHasta = $('#fechaHasta').val();
@@ -233,7 +230,7 @@
                     }
 
                     contabilidadChart = new Chart(ctx, {
-                        type: 'bar',
+                        type: chartTypeSelect,
                         data: {
                             labels: result.labels,
                             datasets: datasets
@@ -256,6 +253,20 @@
                 }
         }
 
+         // Cargar Date Desde y Hasta
+        function cargarDateDesdeHasta(){
+            const hoy = new Date();
+            const fechaHasta = hoy.toISOString().split('T')[0];
+            const unMesAntes = new Date(hoy);
+
+            unMesAntes.setMonth(unMesAntes.getMonth() - 6);
+            unMesAntes.setDate(1);
+
+            const fechaDesde = unMesAntes.toISOString().split('T')[0];
+
+            document.getElementById('fechaDesde').value = fechaDesde;
+            document.getElementById('fechaHasta').value = fechaHasta;
+        }
 
         function formatearFecha(fechaIso) {
             const fecha = new Date(fechaIso);

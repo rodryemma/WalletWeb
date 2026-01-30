@@ -262,6 +262,77 @@ namespace Infra.DataAccess.Repository
 
         }
 
+        public async Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadJoinDBFullAsync(string xTipo, DateTime xFechaDesde, DateTime xFechaHasta)
+        {
+            using (MySqlConnection c = await _IConnectionFactory.ObtenerConexionMySqlAsync(_connectionString))
+            {
+                try
+                {
+                    var baseSql = "SELECT CP.Id, CP.Fecha, CP.CantidadDivisa, CP.Comentario, CP.TipoMovimiento, CP.ValorCCL, CP.DivisaId, CP.CuentaWalletId, CP.CategoriaId, " +
+                        "C.Nombre AS Categoria, " +
+                        "D.Nombre AS Divisa, " +
+                        "CW.Nombre AS Cuenta " +
+                        "FROM ContabilidadPersonal AS CP " +
+                        "INNER JOIN Categoria AS C ON (C.Id = CP.CategoriaId)  " +
+                        "INNER JOIN Divisa AS D ON (D.Id = CP.DivisaId) " +
+                        "INNER JOIN CuentaWallet AS CW ON (CW.Id = CP.CuentaWalletId) " +
+                        "WHERE  CP.Fecha >= @FechaDesde AND CP.Fecha <= @FechaHasta ";
+                    var whereClause = "";
+                    var parametros = new List<MySqlParameter>();
+                    parametros.Add(new MySqlParameter("@FechaDesde", xFechaDesde.ToString("yyyy-MM-dd HH:mm:ss")));
+                    parametros.Add(new MySqlParameter("@FechaHasta", xFechaHasta.ToString("yyyy-MM-dd HH:mm:ss")));
+
+                    if (!string.Equals(xTipo, "total", StringComparison.OrdinalIgnoreCase))
+                    {
+                        whereClause = " AND TipoMovimiento = @Tipo";
+                        parametros.Add(new MySqlParameter("@Tipo", xTipo.ToLower()));
+                    }
+
+                    var sqlString = $"{baseSql}{whereClause} ORDER BY Fecha DESC";
+
+                    using (MySqlCommand Comando = new MySqlCommand(sqlString, c))
+                    {
+                        if (parametros.Any())
+                            Comando.Parameters.AddRange(parametros.ToArray());
+
+                        using (MySqlDataReader reader = await Comando.ExecuteReaderAsync())
+                        {
+                            List<Contabilidad> query = new List<Contabilidad>();
+                            while (await reader.ReadAsync())
+                            {
+                                query.Add(new Contabilidad()
+                                {
+                                    Id = reader.GetInt32("Id"),
+                                    Fecha = reader.GetDateTime("Fecha"),
+                                    Categoria = reader["Categoria"].ToString(),
+                                    Cuenta = reader["Cuenta"].ToString(),
+                                    CantidadDivisa = reader.GetFloat("CantidadDivisa"),
+                                    Divisa = reader["Divisa"].ToString(),
+                                    Comentario = reader["Comentario"].ToString(),
+                                    TipoMovimiento = reader["TipoMovimiento"].ToString(),
+                                    ValorCCL = reader.GetFloat("ValorCCL"),
+                                    CategoriaId = reader.GetInt32("CategoriaId"),
+                                    DivisaId = reader.GetInt32("DivisaId"),
+                                    CuentaWalletId = reader.GetInt32("CuentaWalletId")
+                                });
+
+                            }
+                            return OperationResult<List<Contabilidad>>.Ok(query);
+                        }
+                    }
+                }
+                catch (MySqlException ex)
+                {
+                    return OperationResult<List<Contabilidad>>.Fail("Error al obtener consulta: " + ex.Message);
+                }
+                catch (Exception ex)
+                {
+                    return OperationResult<List<Contabilidad>>.Fail("Error al obtener consulta: " + ex.Message);
+                }
+            }
+
+        }
+
         public DataTable ObtenerContabilidadDBFull()
         {
             using (MySqlConnection c = _IConnectionFactory.ObtenerConexionMySql(_connectionString))

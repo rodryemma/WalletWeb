@@ -15,6 +15,7 @@ namespace Domain.Model.Interfaces
         Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadDBFullAsync(string xTipo);
         Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadDBFullAsync(string xTipo, DateTime xFechaDesde);
         Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadJoinDBFullAsync(string xTipo, DateTime xFechaDesde);
+        Task<OperationResult<List<Contabilidad>>> ObtenerContabilidadJoinDBFullAsync(string xTipo, DateTime xFechaDesde, DateTime xFechaHasta);        
         DataTable ObtenerContabilidadDBFull();
         Task<int> InsertarContabilidadPersonalAsync(Contabilidad xContabilidad, string xValorCCL);
         Task<OperationResult<int>> EditarContabilidadPersonalAsync(Contabilidad xContabilidad);
