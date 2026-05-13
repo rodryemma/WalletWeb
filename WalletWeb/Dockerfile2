@@ -1,0 +1,40 @@
+# Dockerfile para ASP.NET 8 - WalletWeb
+# Usa la imagen base de .NET 8 SDK para compilar
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copiar los archivos de solución y proyecto
+COPY WalletWeb/WalletWeb.sln ./WalletWeb/
+COPY Application.Interfaces/Application.csproj ./Application.Interfaces/
+COPY Domain.Entity/Domain.Model.csproj ./Domain.Entity/
+COPY ExternalServices/Infra.ExternalServices.csproj ./ExternalServices/
+COPY Infra.DataAccess/Infra.DataAccess.csproj ./Infra.DataAccess/
+COPY Shared/Shared.csproj ./Shared/
+COPY WalletWeb/UI.WalletWeb.csproj ./WalletWeb/
+
+# Restaurar dependencias
+RUN dotnet restore ./WalletWeb/WalletWeb.sln
+
+# Copiar todo el código fuente
+COPY . .
+
+# Compilar y publicar la aplicación
+WORKDIR /src/WalletWeb
+RUN dotnet publish UI.WalletWeb.csproj -c Release -o /app/publish
+
+# Imagen runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Copiar los archivos publicados
+COPY --from=build /app/publish .
+
+# Exponer el puerto (por defecto ASP.NET usa 8080 en contenedores)
+EXPOSE 8080
+EXPOSE 8081
+
+# Variable de entorno para la URL
+ENV ASPNETCORE_URLS=http://+:8080
+
+# Comando de inicio
+ENTRYPOINT ["dotnet", "UI.WalletWeb.dll"]

@@ -28,10 +28,10 @@ namespace UI.WalletWeb.Controllers
         }
 
         [HttpGet("transacciones/json")]
-        public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01")
+        public async Task<IActionResult> GetTransacciones(string tipoMovimiento = "Total", string fecha = "2025-01-01", string moneda = "USD")
         {
             var FechaObtenida = ValidationHelper.ValidarFecha(fecha);
-            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(tipoMovimiento.ToLower(), FechaObtenida, moneda);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
             
             var lista = transacciones.Data.Select(x => new
