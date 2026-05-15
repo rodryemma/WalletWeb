@@ -100,7 +100,7 @@ namespace Application.Services
             return OperationResult<List<ContabilidadDto>>.Ok(movimiento);
         }
 
-        public async Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadJoinDBFullAsyncService(string xTipo, DateTime xFechaDesde, DateTime xFechaHasta)
+        public async Task<OperationResult<List<ContabilidadDto>>> ObtenerContabilidadJoinDBFullAsyncService(string xTipo, DateTime xFechaDesde, DateTime xFechaHasta, string xMoneda = "USD")
         {
             var contabilidadMovimientos = await _ContabilidadRepository.ObtenerContabilidadJoinDBFullAsync(xTipo, xFechaDesde, xFechaHasta);
             if (!contabilidadMovimientos.Success) { return OperationResult<List<ContabilidadDto>>.Fail(contabilidadMovimientos.Message); }
@@ -116,7 +116,7 @@ namespace Application.Services
                 Comentario = m.Comentario,
                 TipoMovimiento = m.TipoMovimiento,
                 ValorCCL = m.ValorCCL,
-                MontoUsd = Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2),
+                MontoUsd = xMoneda == "USD" ? Math.Round(MathHelper.Dividir(m.CantidadDivisa, m.ValorCCL), 2) : m.CantidadDivisa,
                 CategoriaId = m.CategoriaId,
                 DivisaId = m.DivisaId,
                 CuentaWalletId = m.CuentaWalletId

@@ -37,7 +37,7 @@ namespace UI.WalletWeb.Controllers
 
             var FechaDesde = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
             var FechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
-            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta, reporteFiltroCategoriaDto.Moneda);
 
             //var FechaObtenida = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
             //var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaObtenida);
@@ -82,7 +82,7 @@ namespace UI.WalletWeb.Controllers
             var FechaDesde = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaDesde);
             var FechaHasta = ValidationHelper.ValidarFecha(reporteFiltroCategoriaDto.FechaHasta);
 
-            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta);
+            var transacciones = await _contabilidaService.ObtenerContabilidadJoinDBFullAsyncService(reporteFiltroCategoriaDto.TipoMovimiento.ToLower(), FechaDesde, FechaHasta, reporteFiltroCategoriaDto.Moneda);
             if (!transacciones.Success) { return BadRequest(transacciones.Message); }
 
             ChartResultDto result = _reporteService.ObtenerTransaccionesMontoPorCategoria(transacciones, reporteFiltroCategoriaDto);
