@@ -28,12 +28,12 @@
 
     <div class="p-2 bg-light border rounded shadow-sm flex-fill">
         <span class="text-muted small">Total en USD</span>
-        <span class="h6 fw-bold ms-2" id="totalMonto">2278.19</span>
+        <span class="h6 fw-bold ms-2" id="totalMonto"></span>
     </div>
 
     <div class="p-2 bg-light border rounded shadow-sm flex-fill">
         <span class="text-muted small">Dólar CCL</span>
-        <span class="h6 fw-bold ms-2" id="valorDolar">1506,32</span>
+        <span class="h6 fw-bold ms-2" id="valorDolar"></span>
     </div>
 
 </div>
@@ -361,7 +361,7 @@
                 const url = "/ccl/json";
                 const ccl = await apiRequest(url);
                 // document.getElementById("valorDolar").textContent = data.ccl;
-                document.getElementById("valorDolar").textContent = ccl;
+                document.getElementById("valorDolar").textContent = formatoMonedaLocal(ccl);
             } catch (error) {
                 console.error(error);
                 document.getElementById("valorDolar").textContent = "Error al cargar";
@@ -386,7 +386,7 @@
             const fechaHasta = hoy.toISOString().split('T')[0];
             const unMesAntes = new Date(hoy);
 
-            unMesAntes.setMonth(unMesAntes.getMonth() - 3);
+            unMesAntes.setMonth(unMesAntes.getMonth() - 1);
             unMesAntes.setDate(1);
 
             const fechaDesde = unMesAntes.toISOString().split('T')[0];
@@ -417,6 +417,10 @@
             });
 
             let tabla = $('#tablaTransacciones').DataTable({
+                search: {
+                    regex: true,
+                    smart: false
+                },
                 responsive: true,
                 paging: true,
                 destroy: true,
@@ -450,7 +454,7 @@
                     { data: 'cuenta' },
                     {
                         data: 'montoUsd' ,
-                        render: $.fn.dataTable.render.number(',', '.', 2, '$')
+                        render: $.fn.dataTable.render.number('.', ',', 2, '$')
                     },
                     { data: 'comentario' },
                     { data: 'tipoMovimiento' },
@@ -476,13 +480,13 @@
                             .column(3, { filter: 'applied' })//Hacemos que se aplique el filtro en la celda 3 montoUsd
                             .data()
                             .reduce(function (a, b) {
-                                var x = typeof a === 'string' ? parseFloat(a.replace(/[\$,]/g, '')) : a;
-                                var y = typeof b === 'string' ? parseFloat(b.replace(/[\$,]/g, '')) : b;
+                                 var x = typeof a === 'string' ? parseFloat(a.replace(/[\$,]/g, '')) : a;
+                                 var y = typeof b === 'string' ? parseFloat(b.replace(/[\$,]/g, '')) : b;
                                 return (x || 0) + (y || 0);
                             }, 0);
 
                      // Mostrar el total
-                     $('#totalMonto').text(total.toFixed(2));
+                     $('#totalMonto').text(formatoMonedaLocal(total));
                     }
             });
 
