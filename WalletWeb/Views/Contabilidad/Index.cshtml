@@ -27,7 +27,7 @@
 <div class="d-flex gap-3 mb-4">
 
     <div class="p-2 bg-light border rounded shadow-sm flex-fill">
-        <span class="text-muted small">Total en USD</span>
+        <span class="text-muted small" id="tituloMontoTotal">Total USD</span>
         <span class="h6 fw-bold ms-2" id="totalMonto"></span>
     </div>
 
@@ -96,7 +96,7 @@
                 <th>Fecha</th>
                 <th>Categoría</th>
                 <th>Cuenta</th>
-                <th>Monto Usd</th>
+                <th id="tituloMontoTable">Monto USD</th>
                 <th>Comentario</th>
                 <th>Tipo Movimiento</th>
                 <th>Acción</th>
@@ -520,6 +520,8 @@
 
              switchEl.addEventListener('change', async function (){
              const currency = this.checked ? 'ARS' : 'USD';
+             document.getElementById('tituloMontoTotal').textContent = "Total " + currency;
+             document.getElementById('tituloMontoTable').textContent = "Monto " + currency;
              localStorage.setItem('currency', currency);
                 try {
                      $('#tablaTransacciones').DataTable().ajax.reload();
