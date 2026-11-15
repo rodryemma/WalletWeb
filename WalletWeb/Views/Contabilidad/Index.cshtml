@@ -27,7 +27,7 @@
 <div class="d-flex gap-3 mb-4">
 
     <div class="p-2 bg-light border rounded shadow-sm flex-fill">
-        <span class="text-muted small" id="tituloMontoTotal">Total USD</span>
+        <span class="text-muted small" id="tituloMontoTotal">----Total USD</span>
         <span class="h6 fw-bold ms-2" id="totalMonto"></span>
     </div>
 
@@ -512,24 +512,35 @@
         });
 
         
-         // Región : Accion Select Moneda
-         function accionSelectMoneda(){
-             const switchEl = document.getElementById('currencySwitch');
-             const savedCurrency = localStorage.getItem('currency') /* || 'USD' */;
-             switchEl.checked = (savedCurrency === 'ARS');
+         // Región : Accion Select Moneda        
+        function accionSelectMoneda() {
+            const switchEl = document.getElementById('currencySwitch');
+            const savedCurrency = localStorage.getItem('currency') || 'USD';
 
-             switchEl.addEventListener('change', async function (){
-             const currency = this.checked ? 'ARS' : 'USD';
-             document.getElementById('tituloMontoTotal').textContent = "Total " + currency;
-             document.getElementById('tituloMontoTable').textContent = "Monto " + currency;
-             localStorage.setItem('currency', currency);
-                try {
-                     $('#tablaTransacciones').DataTable().ajax.reload();
-                } catch (err) {
-                    console.log('Error al obtener precios:', err);
+            // Aplica la moneda: actualiza títulos y, opcionalmente, recarga la tabla
+            function aplicarMoneda(currency, recargar = true) {
+                document.getElementById('tituloMontoTotal').textContent = "Total " + currency;
+                document.getElementById('tituloMontoTable').textContent = "Monto " + currency;
+                localStorage.setItem('currency', currency);
+
+                if (recargar) {
+                    try {
+                        $('#tablaTransacciones').DataTable().ajax.reload();
+                    } catch (err) {
+                        console.log('Error al recargar la tabla:', err);
+                    }
                 }
-             });
-         }
+            }
+
+            // Estado inicial: sin recargar, porque la tabla se va a cargar sola al inicializarse
+            switchEl.checked = (savedCurrency === 'ARS');
+            aplicarMoneda(savedCurrency, false);
+
+            // Cambios del usuario
+            switchEl.addEventListener('change', function () {
+                aplicarMoneda(this.checked ? 'ARS' : 'USD');
+            });
+        }
 
         // Región: Botón Eliminar Abrir Modal
         let idAEliminar = null;
